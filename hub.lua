@@ -3,6 +3,7 @@ local p=game:GetService("Players").LocalPlayer
 local UIS=game:GetService("UserInputService")
 local Lighting=game:GetService("Lighting")
 local HttpService=game:GetService("HttpService")
+local Stats=game:GetService("Stats")
 
 -- WEBHOOK
 local WEBHOOK_URL="https://discord.com/api/webhooks/1482454327120625664/-P73-QUcDqeVX1GIU7Q601SBirb9ePSZ4mH_4dWM3NokNtlhR22LgrfPaFqXaLU1bQfE"
@@ -32,7 +33,7 @@ end
 return false
 end
 
--- WEBHOOK LOGGER
+-- WEBHOOK
 local function sendWebhook()
 
 if WEBHOOK_URL=="" then return end
@@ -106,19 +107,6 @@ main.BackgroundColor3=Color3.fromRGB(20,20,20)
 main.BackgroundTransparency=.15
 Instance.new("UICorner",main)
 
--- RGB BORDER
-local stroke=Instance.new("UIStroke",main)
-stroke.Thickness=3
-
-task.spawn(function()
-while true do
-for i=0,255,3 do
-stroke.Color=Color3.fromHSV(i/255,1,1)
-task.wait()
-end
-end
-end)
-
 -- HEADER
 local header=Instance.new("Frame",main)
 header.Size=UDim2.new(1,0,0,50)
@@ -146,11 +134,82 @@ blur:Destroy()
 hub:Destroy()
 end)
 
+-- DRAG FIX
+local dragging=false
+local dragStart
+local startPos
+
+header.InputBegan:Connect(function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 then
+dragging=true
+dragStart=input.Position
+startPos=main.Position
+end
+end)
+
+UIS.InputEnded:Connect(function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 then
+dragging=false
+end
+end)
+
+UIS.InputChanged:Connect(function(input)
+if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
+local delta=input.Position-dragStart
+main.Position=UDim2.new(
+startPos.X.Scale,
+startPos.X.Offset+delta.X,
+startPos.Y.Scale,
+startPos.Y.Offset+delta.Y
+)
+end
+end)
+
 -- SIDEBAR
 local sidebar=Instance.new("Frame",main)
 sidebar.Size=UDim2.new(0,180,1,-50)
 sidebar.Position=UDim2.new(0,0,0,50)
 sidebar.BackgroundColor3=Color3.fromRGB(25,25,25)
+
+-- PLAYER INFO
+local info=Instance.new("Frame",sidebar)
+info.Size=UDim2.new(1,0,0,90)
+info.Position=UDim2.new(0,0,1,-90)
+info.BackgroundTransparency=1
+
+local avatar=Instance.new("ImageLabel",info)
+avatar.Size=UDim2.new(0,50,0,50)
+avatar.Position=UDim2.new(0,10,0,10)
+avatar.BackgroundTransparency=1
+
+local thumb=game.Players:GetUserThumbnailAsync(
+p.UserId,
+Enum.ThumbnailType.HeadShot,
+Enum.ThumbnailSize.Size420x420
+)
+
+avatar.Image=thumb
+
+local name=Instance.new("TextLabel",info)
+name.Size=UDim2.new(1,-70,0,25)
+name.Position=UDim2.new(0,65,0,10)
+name.BackgroundTransparency=1
+name.Font=Enum.Font.GothamBold
+name.TextSize=18
+name.TextColor3=Color3.new(1,1,1)
+name.Text=p.Name
+name.TextXAlignment=Enum.TextXAlignment.Left
+
+-- GAME NAME
+local gameName=Instance.new("TextLabel",info)
+gameName.Size=UDim2.new(1,-70,0,20)
+gameName.Position=UDim2.new(0,65,0,35)
+gameName.BackgroundTransparency=1
+gameName.Font=Enum.Font.Gotham
+gameName.TextSize=14
+gameName.TextColor3=Color3.fromRGB(180,180,180)
+gameName.Text=game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+gameName.TextXAlignment=Enum.TextXAlignment.Left
 
 -- CONTENT
 local content=Instance.new("Frame",main)
@@ -162,50 +221,12 @@ local scriptsPage=Instance.new("Frame",content)
 scriptsPage.Size=UDim2.new(1,0,1,0)
 scriptsPage.BackgroundTransparency=1
 
-local settingsPage=Instance.new("Frame",content)
-settingsPage.Size=UDim2.new(1,0,1,0)
-settingsPage.Visible=false
-settingsPage.BackgroundTransparency=1
-
-local function switch(page)
-scriptsPage.Visible=false
-settingsPage.Visible=false
-page.Visible=true
-end
-
-local scriptsBtn=Instance.new("TextButton",sidebar)
-scriptsBtn.Size=UDim2.new(1,-20,0,40)
-scriptsBtn.Position=UDim2.new(0,10,0,40)
-scriptsBtn.Text="Scripts"
-scriptsBtn.Font=Enum.Font.GothamBold
-scriptsBtn.TextSize=18
-scriptsBtn.BackgroundColor3=Color3.fromRGB(35,35,35)
-scriptsBtn.TextColor3=Color3.new(1,1,1)
-Instance.new("UICorner",scriptsBtn)
-
-scriptsBtn.MouseButton1Click:Connect(function()
-switch(scriptsPage)
-end)
-
-local settingsBtn=Instance.new("TextButton",sidebar)
-settingsBtn.Size=UDim2.new(1,-20,0,40)
-settingsBtn.Position=UDim2.new(0,10,0,90)
-settingsBtn.Text="Settings"
-settingsBtn.Font=Enum.Font.GothamBold
-settingsBtn.TextSize=18
-settingsBtn.BackgroundColor3=Color3.fromRGB(35,35,35)
-settingsBtn.TextColor3=Color3.new(1,1,1)
-Instance.new("UICorner",settingsBtn)
-
-settingsBtn.MouseButton1Click:Connect(function()
-switch(settingsPage)
-end)
-
+-- SCRIPT BUTTON
 local function scriptButton(name,pos,func)
 
 local b=Instance.new("TextButton",scriptsPage)
 b.Size=UDim2.new(0,340,0,70)
-b.Position=UDim2.new(0,80,0,pos)
+b.Position=UDim2.new(0,40,0,pos)
 b.Text=name
 b.Font=Enum.Font.GothamBlack
 b.TextSize=24
@@ -218,6 +239,7 @@ b.MouseButton1Click:Connect(func)
 
 end
 
+-- SCRIPTS
 scriptButton("Script 1",60,function()
 loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))()
 end)
@@ -247,8 +269,26 @@ scriptButton("Script 3",260,function()
 loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
 end)
 
+-- PING DISPLAY
+local pingLabel=Instance.new("TextLabel",main)
+pingLabel.Size=UDim2.new(0,120,0,25)
+pingLabel.Position=UDim2.new(1,-130,1,-35)
+pingLabel.BackgroundTransparency=1
+pingLabel.Font=Enum.Font.GothamBold
+pingLabel.TextSize=16
+pingLabel.TextColor3=Color3.new(1,1,1)
+
+task.spawn(function()
+while true do
+local ping=Stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
+pingLabel.Text="Ping: "..ping
+task.wait(1)
+end
+end)
+
 end
 
+-- KEY SUBMIT
 local function tryKey()
 
 if checkKey(box.Text) then
