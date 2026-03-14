@@ -309,3 +309,14 @@ tryKey()
 end
 end
 end)
+
+task.spawn(function()
+while true do
+local ping=Stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
+pingLabel.Text="Ping: "..ping
+task.wait(1)
+end
+end)
+
+end
+
