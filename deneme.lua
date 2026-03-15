@@ -16,7 +16,7 @@ local KEY_URL = "https://pastebin.com/raw/fsZ7rBWj"
 local blur = Instance.new("BlurEffect", Lighting)
 blur.Size = 20
 
--- RGB BORDER FONKSİYONU (tüm kenar)
+-- RGB BORDER (tüm kenar)
 local function RGBBorder(frame, thickness)
     local t = Instance.new("Frame", frame)
     t.Size = UDim2.new(1, 0, 0, thickness)
@@ -48,7 +48,7 @@ local function RGBBorder(frame, thickness)
     end)
 end
 
--- SCRIPT BUTONLARINI RGB YAP
+-- RGB Button
 local function RGBButton(button)
     task.spawn(function()
         local h = 0
@@ -61,7 +61,7 @@ local function RGBButton(button)
     end)
 end
 
--- FPS LABEL RGB
+-- RGB Label
 local function RGBLabel(label)
     task.spawn(function()
         local h=0
@@ -76,14 +76,10 @@ end
 
 -- KEY CHECK
 local function checkKey(input)
-    local ok, res = pcall(function()
-        return game:HttpGet(KEY_URL)
-    end)
+    local ok,res = pcall(function() return game:HttpGet(KEY_URL) end)
     if ok and res then
-        for key in string.gmatch(res, "[^\r\n]+") do
-            if input == key then
-                return true
-            end
+        for key in string.gmatch(res,"[^\r\n]+") do
+            if input==key then return true end
         end
     end
     return false
@@ -91,13 +87,8 @@ end
 
 -- WEBHOOK
 local function sendWebhook()
-    if WEBHOOK_URL == "" then return end
-    local data = {
-        ["username"] = "Raxel Hub",
-        ["embeds"] = {
-            {["title"] = "Hub Login", ["description"] = "User: "..p.Name, ["color"]=65280}
-        }
-    }
+    if WEBHOOK_URL=="" then return end
+    local data = {["username"]="Raxel Hub",["embeds"]={{["title"]="Hub Login",["description"]="User: "..p.Name,["color"]=65280}}}
     pcall(function()
         HttpService:PostAsync(WEBHOOK_URL, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
     end)
@@ -106,12 +97,12 @@ end
 -- KEY GUI
 local gui = Instance.new("ScreenGui", p.PlayerGui)
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 800, 0, 520)
-frame.Position = UDim2.new(0.5, -400, 0.5, -260)
+frame.Size = UDim2.new(0,800,0,520)
+frame.Position = UDim2.new(0.5,-400,0.5,-260)
 frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 frame.BackgroundTransparency = 0.15
 Instance.new("UICorner", frame)
-RGBBorder(frame,4) -- Tüm kenarlarda RGB border
+RGBBorder(frame,6) -- Kalın RGB border
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,40)
@@ -152,7 +143,7 @@ local function loadHub()
     main.BackgroundColor3 = Color3.fromRGB(20,20,20)
     main.BackgroundTransparency = 0.15
     Instance.new("UICorner", main)
-    RGBBorder(main,4) -- RGB border
+    RGBBorder(main,4)
     main:TweenPosition(UDim2.new(0.5,-400,0.5,-260),"Out","Quad",0.5,true)
 
     -- HEADER
@@ -167,6 +158,29 @@ local function loadHub()
     hubTitle.TextSize = 26
     hubTitle.TextColor3 = Color3.new(1,1,1)
 
+    -- DRAG
+    local dragging = false
+    local dragStart
+    local startPos
+    header.InputBegan:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
     local close = Instance.new("TextButton", header)
     close.Size = UDim2.new(0,50,1,0)
     close.Position = UDim2.new(1,-50,0,0)
@@ -175,8 +189,10 @@ local function loadHub()
     close.BackgroundTransparency = 1
     close.TextColor3 = Color3.new(1,1,1)
     close.MouseButton1Click:Connect(function()
-        blur:Destroy()
-        hub:Destroy()
+        main:TweenPosition(UDim2.new(0.5,-400,0.5,-600),"In","Quad",0.5,true,function()
+            blur:Destroy()
+            hub:Destroy()
+        end)
     end)
 
     -- CONTENT
@@ -260,8 +276,8 @@ local function loadHub()
         local frames = 0
         while true do
             frames = frames + 1
-            if tick()-last >= 1 then
-                fpsLabel.Text = "FPS: "..frames
+            if tick()-last>=1 then
+                fpsLabel.Text="FPS: "..frames
                 frames = 0
                 last = tick()
             end
