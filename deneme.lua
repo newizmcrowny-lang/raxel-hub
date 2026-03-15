@@ -16,7 +16,7 @@ local KEY_URL = "https://pastebin.com/raw/fsZ7rBWj"
 local blur = Instance.new("BlurEffect", Lighting)
 blur.Size = 20
 
--- RGB ANIMATION
+-- RGB ANIMATIONS
 local function RGBLabel(label)
     task.spawn(function()
         local h = 0
@@ -41,15 +41,18 @@ local function RGBButton(button)
     end)
 end
 
--- RGB TOGGLE BAR
 local function RGBToggleBar(bar)
     task.spawn(function()
         local h = 0
+        local dir = 1
         while bar.Parent do
             bar.BackgroundColor3 = Color3.fromHSV(h,0.7,1)
             h = h + 0.01
             if h>1 then h=0 end
-            task.wait()
+            local pos = bar.Position.X.Offset + (dir*1)
+            if pos>bar.Parent.AbsoluteSize.X-50 or pos<0 then dir = -dir end
+            bar.Position = UDim2.new(0,pos,0,0)
+            task.wait(0.01)
         end
     end)
 end
@@ -83,7 +86,7 @@ frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 frame.BackgroundTransparency = 0.15
 Instance.new("UICorner", frame)
 
--- RGB BORDER (tüm kenar)
+-- RGB BORDER for KEY
 local function RGBBorder(frame,thick)
     local bars = {}
     local function createBar(size,pos)
@@ -219,7 +222,7 @@ local function loadHub()
 
     local settingsButton = Instance.new("TextButton", sidebar)
     settingsButton.Size = UDim2.new(1,0,0,50)
-    settingsButton.Position = UDim2.new(0,0,0,60)
+    settingsButton.Position = UDim2.new(0,0,0,70) -- boşluk
     settingsButton.Text = "Settings"
     settingsButton.Font = Enum.Font.GothamBlack
     settingsButton.TextSize = 24
@@ -280,7 +283,6 @@ local function loadHub()
     local toggleBar = Instance.new("Frame", blurToggle)
     toggleBar.Size = UDim2.new(0,50,1,0)
     toggleBar.Position = UDim2.new(0,0,0,0)
-    toggleBar.BackgroundColor3 = Color3.fromRGB(0,255,0)
     RGBToggleBar(toggleBar)
 
     blurToggle.InputBegan:Connect(function()
@@ -297,6 +299,53 @@ local function loadHub()
         settingsPage.Visible = true
     end)
 
+    -- BOTTOM LEFT AVATAR + NAME + GAME
+    local info = Instance.new("Frame", main)
+    info.Size = UDim2.new(0,300,0,90)
+    info.Position = UDim2.new(0,10,1,-100)
+    info.BackgroundTransparency = 1
+
+    local avatar = Instance.new("ImageLabel", info)
+    avatar.Size = UDim2.new(0,50,0,50)
+    avatar.Position = UDim2.new(0,0,0,0)
+    avatar.BackgroundTransparency = 1
+    avatar.Image = game.Players:GetUserThumbnailAsync(p.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
+
+    local nameLabel = Instance.new("TextLabel", info)
+    nameLabel.Size = UDim2.new(1,-60,0,25)
+    nameLabel.Position = UDim2.new(0,60,0,0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Font = Enum.Font.GothamBlack
+    nameLabel.TextSize = 24
+    nameLabel.TextColor3 = Color3.new(1,1,1)
+    nameLabel.Text = p.Name
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local gameLabel = Instance.new("TextLabel", info)
+    gameLabel.Size = UDim2.new(1,-60,0,20)
+    gameLabel.Position = UDim2.new(0,60,0,30)
+    gameLabel.BackgroundTransparency = 1
+    gameLabel.Font = Enum.Font.Gotham
+    gameLabel.TextSize = 18
+    gameLabel.TextColor3 = Color3.fromRGB(180,180,180)
+    gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
+    gameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- BOTTOM RIGHT FPS
+    local fpsLabel = Instance.new("TextLabel", main)
+    fpsLabel.Size = UDim2.new(0,120,0,25)
+    fpsLabel.Position = UDim2.new(1,-130,1,-35)
+    fpsLabel.BackgroundTransparency = 1
+    fpsLabel.Font = Enum.Font.GothamBold
+    fpsLabel.TextSize = 16
+    RGBLabel(fpsLabel)
+    task.spawn(function()
+        while true do
+            local fps = Stats.Render.FPS:GetValueString()
+            fpsLabel.Text = "FPS: "..fps
+            task.wait(0.5)
+        end
+    end)
 end
 
 -- KEY TRY
