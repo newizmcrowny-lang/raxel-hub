@@ -211,7 +211,7 @@ local function loadHub()
     sidebar.BackgroundColor3 = Color3.fromRGB(25,25,25)
 
     local scriptsButton = Instance.new("TextButton", sidebar)
-    scriptsButton.Size = UDim2.new(1,0,0,50)
+    scriptsButton.Size = UDim2.new(1,0,0,90) -- tam sığdırdık
     scriptsButton.Position = UDim2.new(0,0,0,0)
     scriptsButton.Text = "Scripts"
     scriptsButton.Font = Enum.Font.GothamBlack
@@ -221,8 +221,8 @@ local function loadHub()
     Instance.new("UICorner", scriptsButton)
 
     local settingsButton = Instance.new("TextButton", sidebar)
-    settingsButton.Size = UDim2.new(1,0,0,50)
-    settingsButton.Position = UDim2.new(0,0,0,70) -- boşluk
+    settingsButton.Size = UDim2.new(1,0,0,90) -- tam sığdırdık
+    settingsButton.Position = UDim2.new(0,0,0,100) -- arada boşluk
     settingsButton.Text = "Settings"
     settingsButton.Font = Enum.Font.GothamBlack
     settingsButton.TextSize = 24
@@ -265,27 +265,17 @@ local function loadHub()
     scriptButton("Script 2",160,function() end)
     scriptButton("Script 3",260,function() end)
 
-    -- SETTINGS TOGGLE BLUR
-    local blurToggle = Instance.new("Frame", settingsPage)
+    -- SETTINGS TOGGLE BLUR (ESKİ HALİ)
+    local blurToggle = Instance.new("TextButton", settingsPage)
     blurToggle.Size = UDim2.new(0,340,0,70)
     blurToggle.Position = UDim2.new(0,40,0,60)
     blurToggle.BackgroundColor3 = Color3.fromRGB(45,45,45)
+    blurToggle.Text = "Toggle Blur"
+    blurToggle.Font = Enum.Font.GothamBlack
+    blurToggle.TextSize = 24
+    blurToggle.TextColor3 = Color3.new(1,1,1)
     Instance.new("UICorner", blurToggle)
-
-    local toggleText = Instance.new("TextLabel", blurToggle)
-    toggleText.Size = UDim2.new(1,0,1,0)
-    toggleText.BackgroundTransparency = 1
-    toggleText.Text = "Toggle Blur"
-    toggleText.Font = Enum.Font.GothamBlack
-    toggleText.TextSize = 24
-    toggleText.TextColor3 = Color3.new(1,1,1)
-
-    local toggleBar = Instance.new("Frame", blurToggle)
-    toggleBar.Size = UDim2.new(0,50,1,0)
-    toggleBar.Position = UDim2.new(0,0,0,0)
-    RGBToggleBar(toggleBar)
-
-    blurToggle.InputBegan:Connect(function()
+    blurToggle.MouseButton1Click:Connect(function()
         blur.Enabled = not blur.Enabled
     end)
 
@@ -299,15 +289,15 @@ local function loadHub()
         settingsPage.Visible = true
     end)
 
-    -- BOTTOM LEFT AVATAR + NAME + GAME
+    -- BOTTOM LEFT AVATAR + NAME + GAME (KÜÇÜLTÜLDÜ)
     local info = Instance.new("Frame", main)
-    info.Size = UDim2.new(0,300,0,90)
-    info.Position = UDim2.new(0,10,1,-100)
+    info.Size = UDim2.new(0,180,0,60)
+    info.Position = UDim2.new(0,10,1,-70)
     info.BackgroundTransparency = 1
 
     local avatar = Instance.new("ImageLabel", info)
     avatar.Size = UDim2.new(0,50,0,50)
-    avatar.Position = UDim2.new(0,0,0,0)
+    avatar.Position = UDim2.new(0,0,0,5)
     avatar.BackgroundTransparency = 1
     avatar.Image = game.Players:GetUserThumbnailAsync(p.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
 
@@ -316,17 +306,17 @@ local function loadHub()
     nameLabel.Position = UDim2.new(0,60,0,0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Font = Enum.Font.GothamBlack
-    nameLabel.TextSize = 24
+    nameLabel.TextSize = 20
     nameLabel.TextColor3 = Color3.new(1,1,1)
     nameLabel.Text = p.Name
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
     local gameLabel = Instance.new("TextLabel", info)
     gameLabel.Size = UDim2.new(1,-60,0,20)
-    gameLabel.Position = UDim2.new(0,60,0,30)
+    gameLabel.Position = UDim2.new(0,60,0,25)
     gameLabel.BackgroundTransparency = 1
     gameLabel.Font = Enum.Font.Gotham
-    gameLabel.TextSize = 18
+    gameLabel.TextSize = 16
     gameLabel.TextColor3 = Color3.fromRGB(180,180,180)
     gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
     gameLabel.TextXAlignment = Enum.TextXAlignment.Left
