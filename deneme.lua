@@ -8,7 +8,7 @@ local Stats=game:GetService("Stats")
 -- WEBHOOK
 local WEBHOOK_URL="https://discord.com/api/webhooks/1482454327120625664/-P73-QUcDqeVX1GIU7Q601SBirb9ePSZ4mH_4dWM3NokNtlhR22LgrfPaFqXaLU1bQfE"
 
--- KEY
+-- KEY URL
 local KEY_URL="https://pastebin.com/raw/fsZ7rBWj"
 
 -- BLUR
@@ -59,42 +59,85 @@ end
 local gui=Instance.new("ScreenGui",p.PlayerGui)
 
 local frame=Instance.new("Frame",gui)
-frame.Size=UDim2.new(0,360,0,220)
-frame.Position=UDim2.new(0.5,-180,0.5,-110)
+frame.Size=UDim2.new(0,800,0,520) -- Key GUI büyütüldü
+frame.Position=UDim2.new(0.5,-400,0.5,-260)
 frame.BackgroundColor3=Color3.fromRGB(25,25,25)
 frame.BackgroundTransparency=.15
 Instance.new("UICorner",frame)
 
+-- RGB BORDER
+local border=Instance.new("Frame",frame)
+border.Size=UDim2.new(1,4,1,4)
+border.Position=UDim2.new(0,-2,0,-2)
+border.BackgroundTransparency=0
+border.BorderSizePixel=0
+Instance.new("UICorner",border)
+task.spawn(function()
+	local h=0
+	while border.Parent do
+		border.BackgroundColor3=Color3.fromHSV(h,1,1)
+		h=h+0.01
+		if h>1 then h=0 end
+		task.wait()
+	end
+end)
+
 local title=Instance.new("TextLabel",frame)
 title.Size=UDim2.new(1,0,0,40)
+title.Position=UDim2.new(0,0,0,0)
 title.BackgroundTransparency=1
 title.Text="RAXEL HUB"
 title.Font=Enum.Font.GothamBlack
 title.TextColor3=Color3.new(1,1,1)
-title.TextSize=24
+title.TextSize=26
 
 local box=Instance.new("TextBox",frame)
-box.Size=UDim2.new(0.8,0,0,40)
+box.Size=UDim2.new(0.8,0,0,50)
 box.Position=UDim2.new(0.1,0,0.45,0)
 box.PlaceholderText="Enter Key"
 box.BackgroundColor3=Color3.fromRGB(40,40,40)
 box.TextColor3=Color3.new(1,1,1)
+box.Font=Enum.Font.GothamBlack -- Script butonlarıyla aynı font
+box.TextSize=24 -- Script butonlarıyla aynı boyut
 Instance.new("UICorner",box)
 
 local enter=Instance.new("TextButton",frame)
-enter.Size=UDim2.new(0.8,0,0,40)
+enter.Size=UDim2.new(0.8,0,0,50)
 enter.Position=UDim2.new(0.1,0,0.75,0)
 enter.Text="ENTER"
-enter.Font=Enum.Font.GothamBold
-enter.TextSize=18
+enter.Font=Enum.Font.GothamBlack
+enter.TextSize=24
 enter.BackgroundColor3=Color3.fromRGB(0,170,255)
 enter.TextColor3=Color3.new(1,1,1)
 Instance.new("UICorner",enter)
 
--- HUB
-local function loadHub()
+-- TRY KEY FUNCTION
+local function tryKey()
+	if checkKey(box.Text) then
+		gui:Destroy()
+		loadHub()
+	else
+		title.Text="INVALID KEY"
+		title.TextColor3=Color3.fromRGB(255,60,60)
+	end
+end
+
+enter.MouseButton1Click:Connect(tryKey)
+box.FocusLost:Connect(function(enterPressed)
+	if enterPressed then tryKey() end
+end)
+UIS.InputBegan:Connect(function(input,gpe)
+	if gpe then return end
+	if input.KeyCode==Enum.KeyCode.Return then
+		if box:IsFocused() then tryKey() end
+	end
+end)
+
+-- HUB FUNCTION
+function loadHub()
 	sendWebhook()
 	local hub=Instance.new("ScreenGui",p.PlayerGui)
+
 	local main=Instance.new("Frame",hub)
 	main.Size=UDim2.new(0,800,0,520)
 	main.Position=UDim2.new(0.5,-400,0.5,-260)
@@ -115,7 +158,6 @@ local function loadHub()
 	hubTitle.TextSize=26
 	hubTitle.TextColor3=Color3.new(1,1,1)
 
-	-- CLOSE BUTTON
 	local close=Instance.new("TextButton",header)
 	close.Size=UDim2.new(0,50,1,0)
 	close.Position=UDim2.new(1,-50,0,0)
@@ -128,36 +170,65 @@ local function loadHub()
 		hub:Destroy()
 	end)
 
-	-- DRAG FIX
-	local dragging=false
-	local dragStart
-	local startPos
-	header.InputBegan:Connect(function(input)
-		if input.UserInputType==Enum.UserInputType.MouseButton1 then
-			dragging=true
-			dragStart=input.Position
-			startPos=main.Position
-		end
+	-- CONTENT
+	local content=Instance.new("Frame",main)
+	content.Size=UDim2.new(1,-180,1,-50)
+	content.Position=UDim2.new(0,180,0,50)
+	content.BackgroundTransparency=1
+
+	-- Scripts Page
+	local scriptsPage=Instance.new("Frame",content)
+	scriptsPage.Size=UDim2.new(1,0,1,0)
+	scriptsPage.BackgroundTransparency=1
+
+	-- Settings Page
+	local settingsPage=Instance.new("Frame",content)
+	settingsPage.Size=UDim2.new(1,0,1,0)
+	settingsPage.BackgroundTransparency=1
+	settingsPage.Visible=false
+
+	-- Toggle Blur
+	local blurToggle=Instance.new("TextButton",settingsPage)
+	blurToggle.Size=UDim2.new(0,340,0,70)
+	blurToggle.Position=UDim2.new(0,40,0,60)
+	blurToggle.Text="Toggle Blur"
+	blurToggle.Font=Enum.Font.GothamBlack
+	blurToggle.TextSize=24 -- Script butonlarıyla aynı
+	blurToggle.TextColor3=Color3.new(1,1,1)
+	blurToggle.BackgroundColor3=Color3.fromRGB(45,45,45)
+	Instance.new("UICorner",blurToggle)
+	blurToggle.MouseButton1Click:Connect(function()
+		blur.Enabled = not blur.Enabled
 	end)
-	UIS.InputEnded:Connect(function(input)
-		if input.UserInputType==Enum.UserInputType.MouseButton1 then
-			dragging=false
-		end
-	end)
-	UIS.InputChanged:Connect(function(input)
-		if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
-			local delta=input.Position-dragStart
-			main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
+
+	-- FPS sağ altta
+	local fpsLabel=Instance.new("TextLabel",main)
+	fpsLabel.Size=UDim2.new(0,120,0,25)
+	fpsLabel.Position=UDim2.new(1,-130,1,-35)
+	fpsLabel.BackgroundTransparency=1
+	fpsLabel.Font=Enum.Font.GothamBold
+	fpsLabel.TextSize=16
+	RGB(fpsLabel)
+	task.spawn(function()
+		local last=tick()
+		local frames=0
+		while true do
+			frames=frames+1
+			if tick()-last>=1 then
+				fpsLabel.Text="FPS: "..frames
+				frames=0
+				last=tick()
+			end
+			task.wait()
 		end
 	end)
 
-	-- SIDEBAR
+	-- Sol alt avatar + isim + oyun
 	local sidebar=Instance.new("Frame",main)
 	sidebar.Size=UDim2.new(0,180,1,-50)
 	sidebar.Position=UDim2.new(0,0,0,50)
-	sidebar.BackgroundColor3=Color3.fromRGB(25,25,25)
+	sidebar.BackgroundTransparency=1
 
-	-- PLAYER INFO SOL ALT
 	local info=Instance.new("Frame",sidebar)
 	info.Size=UDim2.new(1,0,0,90)
 	info.Position=UDim2.new(0,0,1,-90)
@@ -167,8 +238,7 @@ local function loadHub()
 	avatar.Size=UDim2.new(0,50,0,50)
 	avatar.Position=UDim2.new(0,10,0,10)
 	avatar.BackgroundTransparency=1
-	local thumb=game.Players:GetUserThumbnailAsync(p.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
-	avatar.Image=thumb
+	avatar.Image=game.Players:GetUserThumbnailAsync(p.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
 
 	local name=Instance.new("TextLabel",info)
 	name.Size=UDim2.new(1,-70,0,25)
@@ -189,94 +259,4 @@ local function loadHub()
 	gameName.TextColor3=Color3.fromRGB(180,180,180)
 	gameName.Text=game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 	gameName.TextXAlignment=Enum.TextXAlignment.Left
-
-	-- CONTENT
-	local content=Instance.new("Frame",main)
-	content.Size=UDim2.new(1,-180,1,-50)
-	content.Position=UDim2.new(0,180,0,50)
-	content.BackgroundTransparency=1
-
-	local scriptsPage=Instance.new("Frame",content)
-	scriptsPage.Size=UDim2.new(1,0,1,0)
-	scriptsPage.BackgroundTransparency=1
-
-	local settingsPage=Instance.new("Frame",content)
-	settingsPage.Size=UDim2.new(1,0,1,0)
-	settingsPage.BackgroundTransparency=1
-	settingsPage.Visible=false
-
-	-- ANIMATED TOGGLE BLUR SWITCH
-	local blurToggle=Instance.new("TextButton",settingsPage)
-	blurToggle.Size=UDim2.new(0,340,0,70)
-	blurToggle.Position=UDim2.new(0,40,0,60)
-	blurToggle.Text=""
-	blurToggle.Font=Enum.Font.GothamBlack
-	blurToggle.TextSize=24
-	blurToggle.TextColor3=Color3.new(1,1,1)
-	blurToggle.BackgroundColor3=Color3.fromRGB(45,45,45)
-	Instance.new("UICorner",blurToggle)
-
-	local toggleCircle=Instance.new("Frame",blurToggle)
-	toggleCircle.Size=UDim2.new(0,30,0,30)
-	toggleCircle.Position=UDim2.new(0,5,0.5,-15)
-	toggleCircle.BackgroundColor3=Color3.fromRGB(0,170,255)
-	toggleCircle.ClipsDescendants=true
-	Instance.new("UICorner",toggleCircle)
-
-	local toggleState=false
-	blurToggle.MouseButton1Click:Connect(function()
-		toggleState = not toggleState
-		blur.Enabled = toggleState
-		toggleCircle:TweenPosition(
-			UDim2.new(toggleState and 1 or 0, toggleState and -35 or 5,0.5,-15),
-			Enum.EasingDirection.Out,
-			Enum.EasingStyle.Quad,
-			0.2,
-			true
-		)
-	end)
-
-	-- FPS LABEL (RGB)
-	local fpsLabel=Instance.new("TextLabel",main)
-	fpsLabel.Size=UDim2.new(0,120,0,25)
-	fpsLabel.Position=UDim2.new(1,-130,1,-35)
-	fpsLabel.BackgroundTransparency=1
-	fpsLabel.Font=Enum.Font.GothamBold
-	fpsLabel.TextSize=16
-
-	RGB(fpsLabel)
-	task.spawn(function()
-		local last=tick()
-		local frames=0
-		while true do
-			frames=frames+1
-			if tick()-last>=1 then
-				fpsLabel.Text="FPS: "..frames
-				frames=0
-				last=tick()
-			end
-			task.wait()
-		end
-	end)
-
 end
-
--- KEY SUBMIT
-local function tryKey()
-	if checkKey(box.Text) then
-		gui:Destroy()
-		loadHub()
-	else
-		title.Text="INVALID KEY"
-		title.TextColor3=Color3.fromRGB(255,60,60)
-	end
-end
-
-enter.MouseButton1Click:Connect(tryKey)
-box.FocusLost:Connect(function(enterPressed) if enterPressed then tryKey() end end)
-UIS.InputBegan:Connect(function(input,gpe)
-	if gpe then return end
-	if input.KeyCode==Enum.KeyCode.Return then
-		if box:IsFocused() then tryKey() end
-	end
-end)
