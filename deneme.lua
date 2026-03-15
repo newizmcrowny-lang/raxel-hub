@@ -41,6 +41,19 @@ local function RGBButton(button)
     end)
 end
 
+-- RGB TOGGLE BAR
+local function RGBToggleBar(bar)
+    task.spawn(function()
+        local h = 0
+        while bar.Parent do
+            bar.BackgroundColor3 = Color3.fromHSV(h,0.7,1)
+            h = h + 0.01
+            if h>1 then h=0 end
+            task.wait()
+        end
+    end)
+end
+
 -- KEY CHECK
 local function checkKey(input)
     local ok,res = pcall(function() return game:HttpGet(KEY_URL) end)
@@ -70,6 +83,35 @@ frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 frame.BackgroundTransparency = 0.15
 Instance.new("UICorner", frame)
 
+-- RGB BORDER (tüm kenar)
+local function RGBBorder(frame,thick)
+    local bars = {}
+    local function createBar(size,pos)
+        local f = Instance.new("Frame", frame)
+        f.Size = size
+        f.Position = pos
+        f.BackgroundTransparency = 0
+        f.BorderSizePixel = 0
+        table.insert(bars,f)
+    end
+    createBar(UDim2.new(1,0,0,thick),UDim2.new(0,0,0,0))
+    createBar(UDim2.new(1,0,0,thick),UDim2.new(0,0,1,-thick))
+    createBar(UDim2.new(0,thick,1,0),UDim2.new(0,0,0,0))
+    createBar(UDim2.new(0,thick,1,0),UDim2.new(1,-thick,0,0))
+    task.spawn(function()
+        local h=0
+        while frame.Parent do
+            for _,b in pairs(bars) do
+                b.BackgroundColor3 = Color3.fromHSV(h,1,1)
+            end
+            h = h+0.005
+            if h>1 then h=0 end
+            task.wait()
+        end
+    end)
+end
+RGBBorder(frame,6)
+
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,40)
 title.Position = UDim2.new(0,0,0,0)
@@ -86,7 +128,7 @@ box.PlaceholderText = "Enter Key"
 box.BackgroundColor3 = Color3.fromRGB(40,40,40)
 box.TextColor3 = Color3.new(1,1,1)
 box.Font = Enum.Font.GothamBlack
-box.TextSize = 24
+box.TextSize = 26
 Instance.new("UICorner", box)
 
 local enter = Instance.new("TextButton", frame)
@@ -94,12 +136,12 @@ enter.Size = UDim2.new(0.8,0,0,50)
 enter.Position = UDim2.new(0.1,0,0.75,0)
 enter.Text = "ENTER"
 enter.Font = Enum.Font.GothamBlack
-enter.TextSize = 24
+enter.TextSize = 26
 enter.BackgroundColor3 = Color3.fromRGB(0,170,255)
 enter.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", enter)
 
--- HUB
+-- HUB LOAD
 local function loadHub()
     sendWebhook()
     local hub = Instance.new("ScreenGui", p.PlayerGui)
@@ -159,7 +201,7 @@ local function loadHub()
         end)
     end)
 
-    -- SIDEBAR KATEGORİLER
+    -- SIDEBAR
     local sidebar = Instance.new("Frame", main)
     sidebar.Size = UDim2.new(0,180,1,-50)
     sidebar.Position = UDim2.new(0,0,0,50)
@@ -185,12 +227,12 @@ local function loadHub()
     settingsButton.BackgroundColor3 = Color3.fromRGB(45,45,45)
     Instance.new("UICorner", settingsButton)
 
-    -- CONTENT
     local content = Instance.new("Frame", main)
     content.Size = UDim2.new(1,-180,1,-50)
     content.Position = UDim2.new(0,180,0,50)
     content.BackgroundTransparency = 1
 
+    -- PAGES
     local scriptsPage = Instance.new("Frame", content)
     scriptsPage.Size = UDim2.new(1,0,1,0)
     scriptsPage.BackgroundTransparency = 1
@@ -201,7 +243,7 @@ local function loadHub()
     settingsPage.BackgroundTransparency = 1
     settingsPage.Visible = false
 
-    -- SCRIPT BUTONLARI
+    -- SCRIPT BUTTONS
     local function scriptButton(name,pos,func)
         local b=Instance.new("TextButton",scriptsPage)
         b.Size = UDim2.new(0,340,0,70)
@@ -221,17 +263,29 @@ local function loadHub()
     scriptButton("Script 3",260,function() end)
 
     -- SETTINGS TOGGLE BLUR
-    local blurToggle = Instance.new("TextButton", settingsPage)
+    local blurToggle = Instance.new("Frame", settingsPage)
     blurToggle.Size = UDim2.new(0,340,0,70)
     blurToggle.Position = UDim2.new(0,40,0,60)
-    blurToggle.Text = "Toggle Blur"
-    blurToggle.Font = Enum.Font.GothamBlack
-    blurToggle.TextSize = 24
-    blurToggle.TextColor3 = Color3.new(1,1,1)
     blurToggle.BackgroundColor3 = Color3.fromRGB(45,45,45)
     Instance.new("UICorner", blurToggle)
-    blurToggle.MouseButton1Click:Connect(function() blur.Enabled = not blur.Enabled end)
-    RGBButton(blurToggle)
+
+    local toggleText = Instance.new("TextLabel", blurToggle)
+    toggleText.Size = UDim2.new(1,0,1,0)
+    toggleText.BackgroundTransparency = 1
+    toggleText.Text = "Toggle Blur"
+    toggleText.Font = Enum.Font.GothamBlack
+    toggleText.TextSize = 24
+    toggleText.TextColor3 = Color3.new(1,1,1)
+
+    local toggleBar = Instance.new("Frame", blurToggle)
+    toggleBar.Size = UDim2.new(0,50,1,0)
+    toggleBar.Position = UDim2.new(0,0,0,0)
+    toggleBar.BackgroundColor3 = Color3.fromRGB(0,255,0)
+    RGBToggleBar(toggleBar)
+
+    blurToggle.InputBegan:Connect(function()
+        blur.Enabled = not blur.Enabled
+    end)
 
     -- CATEGORY SWITCH
     scriptsButton.MouseButton1Click:Connect(function()
@@ -242,6 +296,7 @@ local function loadHub()
         scriptsPage.Visible = false
         settingsPage.Visible = true
     end)
+
 end
 
 -- KEY TRY
