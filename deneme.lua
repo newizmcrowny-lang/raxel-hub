@@ -16,7 +16,7 @@ local KEY_URL = "https://pastebin.com/raw/fsZ7rBWj"
 local blur = Instance.new("BlurEffect", Lighting)
 blur.Size = 20
 
--- RGB ANIMATIONS
+-- RGB LABEL
 local function RGBLabel(label)
     task.spawn(function()
         local h = 0
@@ -25,34 +25,6 @@ local function RGBLabel(label)
             h = h + 0.005
             if h>1 then h=0 end
             task.wait()
-        end
-    end)
-end
-
-local function RGBButton(button)
-    task.spawn(function()
-        local h = 0
-        while button.Parent do
-            button.BackgroundColor3 = Color3.fromHSV(h,0.7,1)
-            h = h + 0.005
-            if h>1 then h=0 end
-            task.wait()
-        end
-    end)
-end
-
-local function RGBToggleBar(bar)
-    task.spawn(function()
-        local h = 0
-        local dir = 1
-        while bar.Parent do
-            bar.BackgroundColor3 = Color3.fromHSV(h,0.7,1)
-            h = h + 0.01
-            if h>1 then h=0 end
-            local pos = bar.Position.X.Offset + (dir*1)
-            if pos>bar.Parent.AbsoluteSize.X-50 or pos<0 then dir = -dir end
-            bar.Position = UDim2.new(0,pos,0,0)
-            task.wait(0.01)
         end
     end)
 end
@@ -211,7 +183,7 @@ local function loadHub()
     sidebar.BackgroundColor3 = Color3.fromRGB(25,25,25)
 
     local scriptsButton = Instance.new("TextButton", sidebar)
-    scriptsButton.Size = UDim2.new(1,0,0,90) -- tam sığdırdık
+    scriptsButton.Size = UDim2.new(1,0,0,90)
     scriptsButton.Position = UDim2.new(0,0,0,0)
     scriptsButton.Text = "Scripts"
     scriptsButton.Font = Enum.Font.GothamBlack
@@ -221,8 +193,8 @@ local function loadHub()
     Instance.new("UICorner", scriptsButton)
 
     local settingsButton = Instance.new("TextButton", sidebar)
-    settingsButton.Size = UDim2.new(1,0,0,90) -- tam sığdırdık
-    settingsButton.Position = UDim2.new(0,0,0,100) -- arada boşluk
+    settingsButton.Size = UDim2.new(1,0,0,90)
+    settingsButton.Position = UDim2.new(0,0,0,100)
     settingsButton.Text = "Settings"
     settingsButton.Font = Enum.Font.GothamBlack
     settingsButton.TextSize = 24
@@ -258,14 +230,22 @@ local function loadHub()
         b.BackgroundColor3 = Color3.fromRGB(45,45,45)
         Instance.new("UICorner",b)
         b.MouseButton1Click:Connect(func)
-        RGBButton(b)
+        task.spawn(function()
+            local h=0
+            while b.Parent do
+                b.BackgroundColor3 = Color3.fromHSV(h,0.7,1)
+                h=h+0.005
+                if h>1 then h=0 end
+                task.wait()
+            end
+        end)
     end
 
     scriptButton("Script 1",60,function() loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))() end)
     scriptButton("Script 2",160,function() end)
     scriptButton("Script 3",260,function() end)
 
-    -- SETTINGS TOGGLE BLUR (ESKİ HALİ)
+    -- SETTINGS TOGGLE BLUR (NORMAL BUTTON)
     local blurToggle = Instance.new("TextButton", settingsPage)
     blurToggle.Size = UDim2.new(0,340,0,70)
     blurToggle.Position = UDim2.new(0,40,0,60)
@@ -289,34 +269,34 @@ local function loadHub()
         settingsPage.Visible = true
     end)
 
-    -- BOTTOM LEFT AVATAR + NAME + GAME (KÜÇÜLTÜLDÜ)
+    -- BOTTOM LEFT AVATAR + NAME + GAME (KÜÇÜLTÜLDÜ, SİĞDIRILDI)
     local info = Instance.new("Frame", main)
-    info.Size = UDim2.new(0,180,0,60)
-    info.Position = UDim2.new(0,10,1,-70)
+    info.Size = UDim2.new(0,160,0,50)
+    info.Position = UDim2.new(0,10,1,-60)
     info.BackgroundTransparency = 1
 
     local avatar = Instance.new("ImageLabel", info)
-    avatar.Size = UDim2.new(0,50,0,50)
+    avatar.Size = UDim2.new(0,40,0,40)
     avatar.Position = UDim2.new(0,0,0,5)
     avatar.BackgroundTransparency = 1
     avatar.Image = game.Players:GetUserThumbnailAsync(p.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
 
     local nameLabel = Instance.new("TextLabel", info)
-    nameLabel.Size = UDim2.new(1,-60,0,25)
-    nameLabel.Position = UDim2.new(0,60,0,0)
+    nameLabel.Size = UDim2.new(1,-50,0,20)
+    nameLabel.Position = UDim2.new(0,45,0,0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Font = Enum.Font.GothamBlack
-    nameLabel.TextSize = 20
+    nameLabel.TextSize = 18
     nameLabel.TextColor3 = Color3.new(1,1,1)
     nameLabel.Text = p.Name
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
     local gameLabel = Instance.new("TextLabel", info)
-    gameLabel.Size = UDim2.new(1,-60,0,20)
-    gameLabel.Position = UDim2.new(0,60,0,25)
+    gameLabel.Size = UDim2.new(1,-50,0,15)
+    gameLabel.Position = UDim2.new(0,45,0,25)
     gameLabel.BackgroundTransparency = 1
     gameLabel.Font = Enum.Font.Gotham
-    gameLabel.TextSize = 16
+    gameLabel.TextSize = 14
     gameLabel.TextColor3 = Color3.fromRGB(180,180,180)
     gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
     gameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -328,11 +308,14 @@ local function loadHub()
     fpsLabel.BackgroundTransparency = 1
     fpsLabel.Font = Enum.Font.GothamBold
     fpsLabel.TextSize = 16
-    RGBLabel(fpsLabel)
     task.spawn(function()
-        while true do
+        local h=0
+        while fpsLabel.Parent do
             local fps = Stats.Render.FPS:GetValueString()
             fpsLabel.Text = "FPS: "..fps
+            fpsLabel.TextColor3 = Color3.fromHSV(h,1,1)
+            h=h+0.01
+            if h>1 then h=0 end
             task.wait(0.5)
         end
     end)
