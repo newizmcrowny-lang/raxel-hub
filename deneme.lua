@@ -301,13 +301,25 @@ local function loadHub()
     gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
     gameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- FPS LABEL DÜZELTME
-local fpsLabel = Instance.new("TextLabel", main)
-fpsLabel.Size = UDim2.new(0,120,0,25)
-fpsLabel.Position = UDim2.new(1,-130,1,-35)
-fpsLabel.BackgroundTransparency = 1
-fpsLabel.Font = Enum.Font.GothamBold
-fpsLabel.TextSize = 16
+    -- BOTTOM RIGHT FPS
+    local fpsLabel = Instance.new("TextLabel", main)
+    fpsLabel.Size = UDim2.new(0,120,0,25)
+    fpsLabel.Position = UDim2.new(1,-130,1,-35)
+    fpsLabel.BackgroundTransparency = 1
+    fpsLabel.Font = Enum.Font.GothamBold
+    fpsLabel.TextSize = 16
+    task.spawn(function()
+        local h=0
+        while fpsLabel.Parent do
+            local fps = Stats.Render.FPS:GetValueString()
+            fpsLabel.Text = "FPS: "..fps
+            fpsLabel.TextColor3 = Color3.fromHSV(h,1,1)
+            h=h+0.01
+            if h>1 then h=0 end
+            task.wait(0.5)
+        end
+    end)
+end
 
 -- KEY TRY
 enter.MouseButton1Click:Connect(function()
@@ -321,15 +333,3 @@ enter.MouseButton1Click:Connect(function()
         title.TextColor3=Color3.fromRGB(255,60,60)
     end
 end)
-
--- ARKA PLAN CONSTELLATION EFFECT (nokta ve çizgi animasyonu)
-local constellationLayer = Instance.new("Frame", main)
-constellationLayer.Size = UDim2.new(1,0,1,0)
-constellationLayer.BackgroundTransparency = 1
-constellationLayer.ZIndex = 0
-
-local points = {}
-local connections = {}
-local pointCount = 50
-
-
