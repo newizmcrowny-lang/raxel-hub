@@ -321,22 +321,30 @@ local function loadHub()
     gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
     gameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- BOTTOM RIGHT FPS
-    local fpsLabel = Instance.new("TextLabel", main)
-    fpsLabel.Size = UDim2.new(0,120,0,25)
-    fpsLabel.Position = UDim2.new(1,-130,1,-35)
-    fpsLabel.BackgroundTransparency = 1
-    fpsLabel.Font = Enum.Font.GothamBold
-    fpsLabel.TextSize = 16
-    RGBLabel(fpsLabel)
-    task.spawn(function()
-        while true do
-            local fps = Stats.Render.FPS:GetValueString()
-            fpsLabel.Text = "FPS: "..fps
-            task.wait(0.5)
-        end
-    end)
-end
+    -- BOTTOM RIGHT FPS (FIXED)
+local RunService = game:GetService("RunService")
+
+local fpsLabel = Instance.new("TextLabel", main)
+fpsLabel.Size = UDim2.new(0,120,0,25)
+fpsLabel.Position = UDim2.new(1,-130,1,-35)
+fpsLabel.BackgroundTransparency = 1
+fpsLabel.Font = Enum.Font.GothamBold
+fpsLabel.TextSize = 16
+fpsLabel.Text = "FPS: 0"
+
+RGBLabel(fpsLabel)
+
+local frames = 0
+local lastTime = tick()
+
+RunService.RenderStepped:Connect(function()
+    frames += 1
+    if tick() - lastTime >= 1 then
+        fpsLabel.Text = "FPS: "..frames
+        frames = 0
+        lastTime = tick()
+    end
+end)
 
 -- KEY TRY
 enter.MouseButton1Click:Connect(function()
