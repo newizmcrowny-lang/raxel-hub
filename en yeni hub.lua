@@ -260,6 +260,7 @@ local function loadHub()
 
     task.wait(1.8)
     loader:Destroy()
+    blur.Destroy()
 
     local main = Instance.new("Frame", hub)
     main.Size = UDim2.new(0,800,0,520)
@@ -384,7 +385,7 @@ local function loadHub()
     scriptsButton.Position = UDim2.new(0,0,0,0)
     scriptsButton.Text = "Scripts"
     scriptsButton.Font = Enum.Font.GothamBlack
-    scriptsButton.TextSize = 24
+    scriptsButton.TextSize = 21
     scriptsButton.TextColor3 = Color3.new(1,1,1)
     scriptsButton.BackgroundColor3 = Color3.fromRGB(45,45,45)
     scriptsButton.BorderSizePixel = 0
@@ -396,7 +397,7 @@ local function loadHub()
     settingsButton.Position = UDim2.new(0,0,0,100)
     settingsButton.Text = "Settings"
     settingsButton.Font = Enum.Font.GothamBlack
-    settingsButton.TextSize = 24
+    settingsButton.TextSize = 21
     settingsButton.TextColor3 = Color3.new(1,1,1)
     settingsButton.BackgroundColor3 = Color3.fromRGB(45,45,45)
     settingsButton.BorderSizePixel = 0
@@ -457,46 +458,47 @@ local function loadHub()
     settingsPage.Visible = false
     settingsPage.ZIndex = 3
 
-    -- SCRIPT BUTTONS
-    local function scriptButton(name, pos, func)
-        local b = Instance.new("TextButton", scriptsPage)
-        b.Size = UDim2.new(0,340,0,70)
-        b.Position = UDim2.new(0,40,0,pos)
-        b.Text = name
-        b.Font = Enum.Font.GothamBlack
-        b.TextSize = 24
-        b.TextColor3 = Color3.new(1,1,1)
-        b.BackgroundColor3 = Color3.fromRGB(45,45,45)
-        b.BorderSizePixel = 0
-        b.ZIndex = 4
-        Instance.new("UICorner", b)
-        b.MouseButton1Click:Connect(func)
-        RGBButton(b)
-        return b
-    end
+-- SCRIPT BUTTONS
+local function scriptButton(name, pos, func)
+    local b = Instance.new("TextButton", scriptsPage)
+    b.Size = UDim2.new(0,340,0,70)
+    b.Position = UDim2.new(0,40,0,pos)
+    b.Text = name
+    b.Font = Enum.Font.GothamBlack
+    b.TextSize = 24
+    b.TextColor3 = Color3.new(1,1,1)
+    b.BackgroundColor3 = Color3.fromRGB(45,45,45)
+    b.BorderSizePixel = 0
+    b.ZIndex = 4
+    Instance.new("UICorner", b)
+    b.MouseButton1Click:Connect(func)
+    RGBButton(b)
+end
 
-    scriptButton("Script 1",60,function()
-        Notify("Raxel Hub", "Script 1 Executed", 3)
-        loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))()
-    end)
+scriptButton("Illusion Hub",60,function()
+    Notify("Raxel Hub","Illusion Hub Executed",3)
+    loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))()
+end)
 
-    scriptButton("Script 2",160,function()
-        Notify("Raxel Hub", "Script 2 Clicked", 3)
-    end)
+scriptButton("MewHub",160,function()
+    Notify("Raxel Hub","MewHub Executed",3)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/mewewef/MewHub/main/loader.lua"))()
+end)
 
-    scriptButton("Script 3",260,function()
-        Notify("Raxel Hub", "Script 3 Clicked", 3)
-    end)
+scriptButton("Auto Grab",260,function()
+    Notify("Raxel Hub","Auto Grab Executed",3)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/JustEzpi/ROBLOX-Scripts/main/AutoGrab.lua"))()
+end)
 
-    scriptButton("Script 4",360,function()
-        Notify("Raxel Hub", "Script 4 Executed", 3)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Tokinu/Allow-Disallow/refs/heads/main/Tokinu"))()
-    end)
+scriptButton("AP Spammer",360,function()
+    Notify("Raxel Hub","AP Spammer Executed",3)
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()
+end)
 
-    scriptButton("Script 5",460,function()
-        Notify("Raxel Hub", "Script 5 Executed", 3)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/baller12468/Kick-if-near-base/refs/heads/main/KickIfNearBase"))()
-    end)
+scriptButton("Auto Bat",460,function()
+    Notify("Raxel Hub","Auto Bat Executed",3)
+    loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/453023ad6c26ed1a"))()
+end)
 
     -- SETTINGS TOGGLE BLUR
     local blurToggle = Instance.new("TextButton", settingsPage)
