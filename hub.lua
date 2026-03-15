@@ -499,6 +499,43 @@ scriptButton("Auto Bat",460,function()
     loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/453023ad6c26ed1a"))()
 end)
 
+-- SCRIPT 6 (Insant TP - Hidden / Coming Soon)
+
+local insantTP = Instance.new("TextButton")
+insantTP.Name = "InsantTP"
+insantTP.Parent = scriptsPage
+insantTP.Size = UDim2.new(0,340,0,70)
+insantTP.Position = UDim2.new(0,40,0,560)
+insantTP.Text = ""
+insantTP.Font = Enum.Font.GothamBlack
+insantTP.TextSize = 24
+insantTP.BackgroundColor3 = Color3.fromRGB(60,60,60)
+insantTP.BackgroundTransparency = 0.35
+insantTP.BorderSizePixel = 0
+insantTP.ZIndex = 4
+Instance.new("UICorner", insantTP)
+
+local stroke = Instance.new("UIStroke")
+stroke.Parent = insantTP
+stroke.Thickness = 2
+stroke.Transparency = 0.4
+
+local soonText = Instance.new("TextLabel")
+soonText.Parent = insantTP
+soonText.Size = UDim2.new(1,0,1,0)
+soonText.BackgroundTransparency = 1
+soonText.Text = "Coming Soon..."
+soonText.Font = Enum.Font.GothamBlack
+soonText.TextSize = 22
+soonText.TextColor3 = Color3.fromRGB(200,200,200)
+soonText.ZIndex = 5
+
+insantTP.MouseButton1Click:Connect(function()
+    Notify("Raxel Hub","Insant TP - Coming Soon",3)
+end)
+
+scriptsPage.CanvasSize = UDim2.new(0,0,0,760)
+
     -- SETTINGS TOGGLE BLUR
     local blurToggle = Instance.new("TextButton", settingsPage)
     blurToggle.Size = UDim2.new(0,340,0,70)
