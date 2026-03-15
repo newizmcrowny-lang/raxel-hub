@@ -3,6 +3,7 @@ local p = game:GetService("Players").LocalPlayer
 local UIS = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local HttpService = game:GetService("HttpService")
+local Stats = game:GetService("Stats")
 local MarketplaceService = game:GetService("MarketplaceService")
 local RunService = game:GetService("RunService")
 
@@ -23,7 +24,7 @@ local function RGBLabel(label)
 		while label.Parent do
 			label.TextColor3 = Color3.fromHSV(h,1,1)
 			h = h + 0.005
-			if h > 1 then h = 0 end
+			if h>1 then h=0 end
 			task.wait()
 		end
 	end)
@@ -31,14 +32,10 @@ end
 
 -- KEY CHECK
 local function checkKey(input)
-	local ok,res = pcall(function()
-		return game:HttpGet(KEY_URL)
-	end)
+	local ok,res = pcall(function() return game:HttpGet(KEY_URL) end)
 	if ok and res then
 		for key in string.gmatch(res,"[^\r\n]+") do
-			if input == key then
-				return true
-			end
+			if input==key then return true end
 		end
 	end
 	return false
@@ -46,23 +43,15 @@ end
 
 -- WEBHOOK
 local function sendWebhook()
-	if WEBHOOK_URL == "" then return end
-	local data = {
-		username="Raxel Hub",
-		embeds={{title="Hub Login",description="User: "..p.Name,color=65280}}
-	}
+	if WEBHOOK_URL=="" then return end
+	local data = {["username"]="Raxel Hub",["embeds"]={{["title"]="Hub Login",["description"]="User: "..p.Name,["color"]=65280}}}
 	pcall(function()
-		HttpService:PostAsync(
-			WEBHOOK_URL,
-			HttpService:JSONEncode(data),
-			Enum.HttpContentType.ApplicationJson
-		)
+		HttpService:PostAsync(WEBHOOK_URL, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
 	end)
 end
 
 -- KEY GUI
 local gui = Instance.new("ScreenGui", p.PlayerGui)
-
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0,800,0,520)
 frame.Position = UDim2.new(0.5,-400,0.5,-260)
@@ -100,27 +89,20 @@ Instance.new("UICorner", enter)
 
 -- HUB LOAD
 local function loadHub()
-
 	sendWebhook()
 
 	local hub = Instance.new("ScreenGui", p.PlayerGui)
-
 	local main = Instance.new("Frame", hub)
 	main.Size = UDim2.new(0,800,0,520)
 	main.Position = UDim2.new(0.5,-400,0.5,-600)
 	main.BackgroundColor3 = Color3.fromRGB(20,20,20)
 	main.BackgroundTransparency = 0.15
 	Instance.new("UICorner", main)
-
-	main:TweenPosition(
-		UDim2.new(0.5,-400,0.5,-260),
-		"Out","Quad",0.5,true
-	)
+	main:TweenPosition(UDim2.new(0.5,-400,0.5,-260),"Out","Quad",0.5,true)
 
 	----------------
 	-- SNOW EFFECT
 	----------------
-
 	local snowFolder = Instance.new("Folder", main)
 
 	local function snow()
@@ -135,23 +117,18 @@ local function loadHub()
 			"Out","Linear",
 			math.random(5,8),
 			true,
-			function()
-				s:Destroy()
-			end
+			function() s:Destroy() end
 		)
 	end
 
 	task.spawn(function()
 		while main.Parent do
 			snow()
-			task.wait(0.1)
+			task.wait(0.12)
 		end
 	end)
 
-	----------------
 	-- HEADER
-	----------------
-
 	local header = Instance.new("Frame", main)
 	header.Size = UDim2.new(1,0,0,50)
 	header.BackgroundTransparency = 1
@@ -164,10 +141,53 @@ local function loadHub()
 	hubTitle.TextSize = 26
 	hubTitle.TextColor3 = Color3.new(1,1,1)
 
-	----------------
-	-- FPS FIX
-	----------------
+	-- SIDEBAR
+	local sidebar = Instance.new("Frame", main)
+	sidebar.Size = UDim2.new(0,180,1,-50)
+	sidebar.Position = UDim2.new(0,0,0,50)
+	sidebar.BackgroundColor3 = Color3.fromRGB(25,25,25)
 
+	local scriptsButton = Instance.new("TextButton", sidebar)
+	scriptsButton.Size = UDim2.new(1,0,0,90)
+	scriptsButton.Text = "Scripts"
+	scriptsButton.Font = Enum.Font.GothamBlack
+	scriptsButton.TextSize = 24
+	scriptsButton.TextColor3 = Color3.new(1,1,1)
+
+	local settingsButton = Instance.new("TextButton", sidebar)
+	settingsButton.Size = UDim2.new(1,0,0,90)
+	settingsButton.Position = UDim2.new(0,0,0,100)
+	settingsButton.Text = "Settings"
+	settingsButton.Font = Enum.Font.GothamBlack
+	settingsButton.TextSize = 24
+	settingsButton.TextColor3 = Color3.new(1,1,1)
+
+	-- SCRIPT PAGE
+	local content = Instance.new("Frame", main)
+	content.Size = UDim2.new(1,-180,1,-50)
+	content.Position = UDim2.new(0,180,0,50)
+
+	local scriptsPage = Instance.new("Frame", content)
+	scriptsPage.Size = UDim2.new(1,0,1,0)
+
+	local function scriptButton(name,pos,func)
+		local b = Instance.new("TextButton",scriptsPage)
+		b.Size = UDim2.new(0,340,0,70)
+		b.Position = UDim2.new(0,40,0,pos)
+		b.Text = name
+		b.Font = Enum.Font.GothamBlack
+		b.TextSize = 24
+		b.TextColor3 = Color3.new(1,1,1)
+		b.MouseButton1Click:Connect(func)
+	end
+
+	scriptButton("Script 1",60,function() end)
+	scriptButton("Script 2",160,function() end)
+	scriptButton("Script 3",260,function() end)
+
+	----------------
+	-- FPS COUNTER
+	----------------
 	local fpsLabel = Instance.new("TextLabel", main)
 	fpsLabel.Size = UDim2.new(0,120,0,25)
 	fpsLabel.Position = UDim2.new(1,-130,1,-35)
@@ -180,40 +200,26 @@ local function loadHub()
 	local last = tick()
 
 	RunService.RenderStepped:Connect(function()
-
 		frames += 1
-
 		if tick() - last >= 1 then
 			fpsLabel.Text = "FPS: "..frames
 			frames = 0
 			last = tick()
 		end
-
 	end)
 
 	RGBLabel(fpsLabel)
-
 end
 
 -- KEY TRY
 enter.MouseButton1Click:Connect(function()
-
 	if checkKey(box.Text) then
-
-		frame:TweenPosition(
-			UDim2.new(0.5,-400,-0.5,-260),
-			"Out","Quad",0.5,true,
-			function()
-				gui:Destroy()
-				loadHub()
-			end
-		)
-
+		frame:TweenPosition(UDim2.new(0.5,-400,-0.5,-260),"Out","Quad",0.5,true,function()
+			gui:Destroy()
+			loadHub()
+		end)
 	else
-
-		title.Text = "INVALID KEY"
-		title.TextColor3 = Color3.fromRGB(255,60,60)
-
+		title.Text="INVALID KEY"
+		title.TextColor3=Color3.fromRGB(255,60,60)
 	end
-
 end)
