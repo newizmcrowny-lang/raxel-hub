@@ -15,12 +15,33 @@ local KEY_URL="https://pastebin.com/raw/fsZ7rBWj"
 local blur=Instance.new("BlurEffect",Lighting)
 blur.Size=20
 
--- RGB TEXT FUNCTION
-local function RGB(label)
+-- RGB GUIDE CORNER FUNCTION (hafif köşe ışığı)
+local function cornerRGB(frame)
+	local tl=Instance.new("Frame",frame)
+	tl.Size=UDim2.new(0,10,0,10)
+	tl.Position=UDim2.new(0,0,0,0)
+	tl.BackgroundTransparency=0
+	tl.BorderSizePixel=0
+	Instance.new("UICorner",tl)
+	
+	local tr=tl:Clone()
+	tr.Position=UDim2.new(1,-10,0,0)
+	tr.Parent=frame
+	
+	local bl=tl:Clone()
+	bl.Position=UDim2.new(0,0,1,-10)
+	bl.Parent=frame
+	
+	local br=tl:Clone()
+	br.Position=UDim2.new(1,-10,1,-10)
+	br.Parent=frame
+	
 	task.spawn(function()
 		local h=0
-		while label.Parent do
-			label.TextColor3=Color3.fromHSV(h,1,1)
+		while frame.Parent do
+			for _,c in pairs({tl,tr,bl,br}) do
+				c.BackgroundColor3=Color3.fromHSV(h,1,1)
+			end
 			h=h+0.01
 			if h>1 then h=0 end
 			task.wait()
@@ -57,30 +78,13 @@ end
 
 -- KEY UI
 local gui=Instance.new("ScreenGui",p.PlayerGui)
-
 local frame=Instance.new("Frame",gui)
-frame.Size=UDim2.new(0,800,0,520) -- Key GUI büyütüldü
+frame.Size=UDim2.new(0,800,0,520)
 frame.Position=UDim2.new(0.5,-400,0.5,-260)
 frame.BackgroundColor3=Color3.fromRGB(25,25,25)
 frame.BackgroundTransparency=.15
 Instance.new("UICorner",frame)
-
--- RGB BORDER
-local border=Instance.new("Frame",frame)
-border.Size=UDim2.new(1,4,1,4)
-border.Position=UDim2.new(0,-2,0,-2)
-border.BackgroundTransparency=0
-border.BorderSizePixel=0
-Instance.new("UICorner",border)
-task.spawn(function()
-	local h=0
-	while border.Parent do
-		border.BackgroundColor3=Color3.fromHSV(h,1,1)
-		h=h+0.01
-		if h>1 then h=0 end
-		task.wait()
-	end
-end)
+cornerRGB(frame) -- RGB köşe ışıkları
 
 local title=Instance.new("TextLabel",frame)
 title.Size=UDim2.new(1,0,0,40)
@@ -97,8 +101,8 @@ box.Position=UDim2.new(0.1,0,0.45,0)
 box.PlaceholderText="Enter Key"
 box.BackgroundColor3=Color3.fromRGB(40,40,40)
 box.TextColor3=Color3.new(1,1,1)
-box.Font=Enum.Font.GothamBlack -- Script butonlarıyla aynı font
-box.TextSize=24 -- Script butonlarıyla aynı boyut
+box.Font = Enum.Font.GothamBlack
+box.TextSize = 24
 Instance.new("UICorner",box)
 
 local enter=Instance.new("TextButton",frame)
@@ -111,30 +115,8 @@ enter.BackgroundColor3=Color3.fromRGB(0,170,255)
 enter.TextColor3=Color3.new(1,1,1)
 Instance.new("UICorner",enter)
 
--- TRY KEY FUNCTION
-local function tryKey()
-	if checkKey(box.Text) then
-		gui:Destroy()
-		loadHub()
-	else
-		title.Text="INVALID KEY"
-		title.TextColor3=Color3.fromRGB(255,60,60)
-	end
-end
-
-enter.MouseButton1Click:Connect(tryKey)
-box.FocusLost:Connect(function(enterPressed)
-	if enterPressed then tryKey() end
-end)
-UIS.InputBegan:Connect(function(input,gpe)
-	if gpe then return end
-	if input.KeyCode==Enum.KeyCode.Return then
-		if box:IsFocused() then tryKey() end
-	end
-end)
-
 -- HUB FUNCTION
-function loadHub()
+local function loadHub()
 	sendWebhook()
 	local hub=Instance.new("ScreenGui",p.PlayerGui)
 
@@ -144,12 +126,15 @@ function loadHub()
 	main.BackgroundColor3=Color3.fromRGB(20,20,20)
 	main.BackgroundTransparency=.15
 	Instance.new("UICorner",main)
+	main.Position=UDim2.new(0.5,-400,0.5,-600) -- başta yukarıda
+
+	-- animasyonlu geçiş
+	main:TweenPosition(UDim2.new(0.5,-400,0.5,-260),"Out","Quad",0.5,true)
 
 	-- HEADER
 	local header=Instance.new("Frame",main)
 	header.Size=UDim2.new(1,0,0,50)
 	header.BackgroundTransparency=1
-
 	local hubTitle=Instance.new("TextLabel",header)
 	hubTitle.Size=UDim2.new(1,0,1,0)
 	hubTitle.BackgroundTransparency=1
@@ -176,12 +161,13 @@ function loadHub()
 	content.Position=UDim2.new(0,180,0,50)
 	content.BackgroundTransparency=1
 
-	-- Scripts Page
+	-- SCRIPTS PAGE
 	local scriptsPage=Instance.new("Frame",content)
 	scriptsPage.Size=UDim2.new(1,0,1,0)
 	scriptsPage.BackgroundTransparency=1
+	scriptsPage.Visible=true
 
-	-- Settings Page
+	-- SETTINGS PAGE
 	local settingsPage=Instance.new("Frame",content)
 	settingsPage.Size=UDim2.new(1,0,1,0)
 	settingsPage.BackgroundTransparency=1
@@ -193,7 +179,7 @@ function loadHub()
 	blurToggle.Position=UDim2.new(0,40,0,60)
 	blurToggle.Text="Toggle Blur"
 	blurToggle.Font=Enum.Font.GothamBlack
-	blurToggle.TextSize=24 -- Script butonlarıyla aynı
+	blurToggle.TextSize=24
 	blurToggle.TextColor3=Color3.new(1,1,1)
 	blurToggle.BackgroundColor3=Color3.fromRGB(45,45,45)
 	Instance.new("UICorner",blurToggle)
@@ -208,7 +194,6 @@ function loadHub()
 	fpsLabel.BackgroundTransparency=1
 	fpsLabel.Font=Enum.Font.GothamBold
 	fpsLabel.TextSize=16
-	RGB(fpsLabel)
 	task.spawn(function()
 		local last=tick()
 		local frames=0
@@ -260,3 +245,17 @@ function loadHub()
 	gameName.Text=game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 	gameName.TextXAlignment=Enum.TextXAlignment.Left
 end
+
+-- KEY TRY
+enter.MouseButton1Click:Connect(function()
+	if checkKey(box.Text) then
+		-- Animasyonlu geçiş
+		frame:TweenPosition(UDim2.new(0.5,-400,-0.5,-260),"Out","Quad",0.5,true,function()
+			gui:Destroy()
+			loadHub()
+		end)
+	else
+		title.Text="INVALID KEY"
+		title.TextColor3=Color3.fromRGB(255,60,60)
+	end
+end)
