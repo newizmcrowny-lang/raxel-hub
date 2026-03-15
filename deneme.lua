@@ -18,28 +18,24 @@ blur.Size = 20
 
 -- RGB BORDER (tüm kenar)
 local function RGBBorder(frame, thickness)
-    local t = Instance.new("Frame", frame)
-    t.Size = UDim2.new(1, 0, 0, thickness)
-    t.Position = UDim2.new(0, 0, 0, 0)
-    t.BackgroundTransparency = 0
-    t.BorderSizePixel = 0
-    local b = t:Clone()
-    b.Size = UDim2.new(1, 0, 0, thickness)
-    b.Position = UDim2.new(0,0,1,-thickness)
-    b.Parent = frame
-    local l = t:Clone()
-    l.Size = UDim2.new(0, thickness,1,0)
-    l.Position = UDim2.new(0,0,0,0)
-    l.Parent = frame
-    local r = l:Clone()
-    r.Position = UDim2.new(1,-thickness,0,0)
-    r.Parent = frame
-    local bars = {t,b,l,r}
+    local bars = {}
+    local function createBar(size,pos)
+        local f = Instance.new("Frame", frame)
+        f.Size = size
+        f.Position = pos
+        f.BackgroundTransparency = 0
+        f.BorderSizePixel = 0
+        table.insert(bars,f)
+    end
+    createBar(UDim2.new(1,0,0,thickness), UDim2.new(0,0,0,0)) -- top
+    createBar(UDim2.new(1,0,0,thickness), UDim2.new(0,0,1,-thickness)) -- bottom
+    createBar(UDim2.new(0,thickness,1,0), UDim2.new(0,0,0,0)) -- left
+    createBar(UDim2.new(0,thickness,1,0), UDim2.new(1,-thickness,0,0)) -- right
     task.spawn(function()
         local h = 0
         while frame.Parent do
-            for _,c in pairs(bars) do
-                c.BackgroundColor3 = Color3.fromHSV(h,1,1)
+            for _,b in pairs(bars) do
+                b.BackgroundColor3 = Color3.fromHSV(h,1,1)
             end
             h = h + 0.005
             if h>1 then h=0 end
@@ -48,26 +44,26 @@ local function RGBBorder(frame, thickness)
     end)
 end
 
--- RGB Button
+-- RGB BUTTON
 local function RGBButton(button)
     task.spawn(function()
-        local h = 0
+        local h=0
         while button.Parent do
             button.BackgroundColor3 = Color3.fromHSV(h,0.7,1)
-            h = h + 0.005
+            h=h+0.005
             if h>1 then h=0 end
             task.wait()
         end
     end)
 end
 
--- RGB Label
+-- RGB LABEL
 local function RGBLabel(label)
     task.spawn(function()
         local h=0
         while label.Parent do
             label.TextColor3 = Color3.fromHSV(h,1,1)
-            h = h + 0.005
+            h=h+0.005
             if h>1 then h=0 end
             task.wait()
         end
@@ -102,7 +98,7 @@ frame.Position = UDim2.new(0.5,-400,0.5,-260)
 frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 frame.BackgroundTransparency = 0.15
 Instance.new("UICorner", frame)
-RGBBorder(frame,6) -- Kalın RGB border
+RGBBorder(frame,6) -- kalın RGB border
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,40)
@@ -133,7 +129,7 @@ enter.BackgroundColor3 = Color3.fromRGB(0,170,255)
 enter.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", enter)
 
--- HUB
+-- HUB LOAD FUNCTION
 local function loadHub()
     sendWebhook()
     local hub = Instance.new("ScreenGui", p.PlayerGui)
@@ -159,28 +155,27 @@ local function loadHub()
     hubTitle.TextColor3 = Color3.new(1,1,1)
 
     -- DRAG
-    local dragging = false
+    local dragging=false
     local dragStart
     local startPos
     header.InputBegan:Connect(function(input)
         if input.UserInputType==Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = main.Position
+            dragging=true
+            dragStart=input.Position
+            startPos=main.Position
         end
     end)
     UIS.InputEnded:Connect(function(input)
-        if input.UserInputType==Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
+        if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end
     end)
     UIS.InputChanged:Connect(function(input)
         if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            local delta=input.Position-dragStart
+            main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
         end
     end)
 
+    -- CLOSE BUTTON ANIMASYONLU
     local close = Instance.new("TextButton", header)
     close.Size = UDim2.new(0,50,1,0)
     close.Position = UDim2.new(1,-50,0,0)
@@ -211,26 +206,24 @@ local function loadHub()
     local settingsPage = Instance.new("Frame", content)
     settingsPage.Size = UDim2.new(1,0,1,0)
     settingsPage.BackgroundTransparency = 1
-    settingsPage.Visible = false
+    settingsPage.Visible = true -- artık görünür
 
     -- SCRIPT BUTONLARI
     local function scriptButton(name,pos,func)
-        local b = Instance.new("TextButton",scriptsPage)
-        b.Size = UDim2.new(0,340,0,70)
-        b.Position = UDim2.new(0,40,0,pos)
-        b.Text = name
-        b.Font = Enum.Font.GothamBlack
-        b.TextSize = 24
-        b.TextColor3 = Color3.new(1,1,1)
-        b.BackgroundColor3 = Color3.fromRGB(45,45,45)
+        local b=Instance.new("TextButton",scriptsPage)
+        b.Size=UDim2.new(0,340,0,70)
+        b.Position=UDim2.new(0,40,0,pos)
+        b.Text=name
+        b.Font=Enum.Font.GothamBlack
+        b.TextSize=24
+        b.TextColor3=Color3.new(1,1,1)
+        b.BackgroundColor3=Color3.fromRGB(45,45,45)
         Instance.new("UICorner",b)
         b.MouseButton1Click:Connect(func)
         RGBButton(b)
     end
 
-    scriptButton("Script 1",60,function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))()
-    end)
+    scriptButton("Script 1",60,function() loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))() end)
     scriptButton("Script 2",160,function()
         local PPS = game:GetService("ProximityPromptService")
         local active=false
@@ -245,9 +238,7 @@ local function loadHub()
             end
         end)
     end)
-    scriptButton("Script 3",260,function()
-        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
-    end)
+    scriptButton("Script 3",260,function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))() end)
 
     -- TOGGLE BLUR
     local blurToggle = Instance.new("TextButton", settingsPage)
@@ -259,11 +250,9 @@ local function loadHub()
     blurToggle.TextColor3 = Color3.new(1,1,1)
     blurToggle.BackgroundColor3 = Color3.fromRGB(45,45,45)
     Instance.new("UICorner", blurToggle)
-    blurToggle.MouseButton1Click:Connect(function()
-        blur.Enabled = not blur.Enabled
-    end)
+    blurToggle.MouseButton1Click:Connect(function() blur.Enabled = not blur.Enabled end)
 
-    -- FPS sağ altta
+    -- FPS LABEL
     local fpsLabel = Instance.new("TextLabel", main)
     fpsLabel.Size = UDim2.new(0,120,0,25)
     fpsLabel.Position = UDim2.new(1,-130,1,-35)
@@ -278,14 +267,14 @@ local function loadHub()
             frames = frames + 1
             if tick()-last>=1 then
                 fpsLabel.Text="FPS: "..frames
-                frames = 0
-                last = tick()
+                frames=0
+                last=tick()
             end
             task.wait()
         end
     end)
 
-    -- Sol alt avatar + isim + oyun
+    -- SOL ALTA AVATAR + İSİM + OYUN
     local sidebar = Instance.new("Frame", main)
     sidebar.Size = UDim2.new(0,180,1,-50)
     sidebar.Position = UDim2.new(0,0,0,50)
@@ -331,7 +320,7 @@ enter.MouseButton1Click:Connect(function()
             loadHub()
         end)
     else
-        title.Text = "INVALID KEY"
-        title.TextColor3 = Color3.fromRGB(255,60,60)
+        title.Text="INVALID KEY"
+        title.TextColor3=Color3.fromRGB(255,60,60)
     end
 end)
