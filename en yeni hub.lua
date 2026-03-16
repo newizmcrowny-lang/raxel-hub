@@ -3,7 +3,8 @@
 
 -- SERVICES
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+local UIS = game:GetService("UserInputService");
+local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Stats = game:GetService("Stats")
 local MarketplaceService = game:GetService("MarketplaceService")
