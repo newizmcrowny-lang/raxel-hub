@@ -3,7 +3,7 @@
 
 -- SERVICES
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+local UIS = game:GetService("UserInputService");
 local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Stats = game:GetService("Stats")
@@ -155,7 +155,7 @@ local function checkKey(input)
 	end)
 
 	if ok and response then
-		for key in string.gmatch(response, "[^\r\n]+") do
+		for key in string.gmatch(response,"[^\r\n]+") do
 			if tostring(input) == key then
 				return true
 			end
@@ -166,9 +166,9 @@ local function checkKey(input)
 end
 
 -- CLEAN OLD GUI
-for _, guiObj in ipairs(p.PlayerGui:GetChildren()) do
-	if guiObj.Name == "RaxelKeyGui" or guiObj.Name == "RaxelHub" then
-		guiObj:Destroy()
+for _, gui in ipairs(p.PlayerGui:GetChildren()) do
+	if gui.Name == "RaxelKeyGui" or gui.Name == "RaxelHub" then
+		gui:Destroy()
 	end
 end
 
@@ -342,9 +342,7 @@ local function loadHub()
 			math.random(4,8),
 			true,
 			function()
-				if snow and snow.Parent then
-					snow:Destroy()
-				end
+				if snow then snow:Destroy() end
 			end
 		)
 	end
@@ -483,6 +481,7 @@ local function loadHub()
 	content.Position = UDim2.new(0,180,0,50)
 	content.BackgroundTransparency = 1
 	content.ZIndex = 3
+	content.ClipsDescendants = true
 
 	-- PAGES
 	local scriptsPage = Instance.new("ScrollingFrame")
@@ -503,6 +502,122 @@ local function loadHub()
 	settingsPage.Visible = false
 	settingsPage.ZIndex = 3
 
+	-- PAGE TRANSITION UI
+	local transitionFrame = Instance.new("Frame")
+	transitionFrame.Parent = content
+	transitionFrame.Size = UDim2.new(1,0,1,0)
+	transitionFrame.Position = UDim2.new(0,0,0,0)
+	transitionFrame.BackgroundColor3 = Color3.fromRGB(10,10,10)
+	transitionFrame.BackgroundTransparency = 1
+	transitionFrame.BorderSizePixel = 0
+	transitionFrame.Visible = false
+	transitionFrame.ZIndex = 20
+
+	local transitionGlow = Instance.new("Frame")
+	transitionGlow.Parent = transitionFrame
+	transitionGlow.Size = UDim2.new(0,0,1,0)
+	transitionGlow.Position = UDim2.new(0,0,0,0)
+	transitionGlow.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	transitionGlow.BackgroundTransparency = 0.15
+	transitionGlow.BorderSizePixel = 0
+	transitionGlow.ZIndex = 21
+
+	local transitionText = Instance.new("TextLabel")
+	transitionText.Parent = transitionFrame
+	transitionText.Size = UDim2.new(1,0,1,0)
+	transitionText.Position = UDim2.new(0,0,0,0)
+	transitionText.BackgroundTransparency = 1
+	transitionText.Text = ""
+	transitionText.Font = Enum.Font.GothamBlack
+	transitionText.TextSize = 34
+	transitionText.TextColor3 = Color3.new(1,1,1)
+	transitionText.TextTransparency = 1
+	transitionText.ZIndex = 22
+
+	task.spawn(function()
+		local h = 0
+		while transitionGlow and transitionGlow.Parent do
+			transitionGlow.BackgroundColor3 = Color3.fromHSV(h, 0.8, 1)
+			h += 0.01
+			if h > 1 then h = 0 end
+			task.wait()
+		end
+	end)
+
+	local switchingPage = false
+	local function playPageTransition(targetName, switchFunc)
+		if switchingPage then return end
+		switchingPage = true
+
+		transitionFrame.Visible = true
+		transitionFrame.BackgroundTransparency = 1
+		transitionGlow.Size = UDim2.new(0,0,1,0)
+		transitionGlow.Position = UDim2.new(0,0,0,0)
+		transitionText.TextTransparency = 1
+		transitionText.Text = targetName
+
+		local bgIn = TweenService:Create(
+			transitionFrame,
+			TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{BackgroundTransparency = 0.25}
+		)
+
+		local glowIn = TweenService:Create(
+			transitionGlow,
+			TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+			{Size = UDim2.new(1,0,1,0)}
+		)
+
+		local textIn = TweenService:Create(
+			transitionText,
+			TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{TextTransparency = 0}
+		)
+
+		bgIn:Play()
+		glowIn:Play()
+		textIn:Play()
+
+		task.wait(0.16)
+
+		if switchFunc then
+			switchFunc()
+		end
+
+		task.wait(0.06)
+
+		local textOut = TweenService:Create(
+			transitionText,
+			TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{TextTransparency = 1}
+		)
+
+		local glowOut = TweenService:Create(
+			transitionGlow,
+			TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+			{
+				Size = UDim2.new(0,0,1,0),
+				Position = UDim2.new(1,0,0,0)
+			}
+		)
+
+		local bgOut = TweenService:Create(
+			transitionFrame,
+			TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{BackgroundTransparency = 1}
+		)
+
+		textOut:Play()
+		glowOut:Play()
+		bgOut:Play()
+
+		task.wait(0.24)
+
+		transitionFrame.Visible = false
+		transitionGlow.Position = UDim2.new(0,0,0,0)
+		switchingPage = false
+	end
+
 	-- SCRIPT BUTTONS
 	local function scriptButton(name, pos, func)
 		local b = Instance.new("TextButton")
@@ -517,79 +632,47 @@ local function loadHub()
 		b.BorderSizePixel = 0
 		b.ZIndex = 4
 		Instance.new("UICorner", b)
+
 		b.MouseButton1Click:Connect(func)
+
 		rgbButton(b)
 		addHoverEffect(b, 10, 6)
+
 		return b
 	end
 
+	-- SCRIPT FONKSİYONLARI
 	local function runScript1()
-		notify("Raxel Hub", "Script 1 çalıştı", 3)
-		print("Script 1 çalıştı")
+		loadstring(game:HttpGet("https://pastebin.com/raw/8Q5cD940"))()
 	end
 
 	local function runScript2()
-		notify("Raxel Hub", "Script 2 çalıştı", 3)
-		print("Script 2 çalıştı")
+		loadstring(game:HttpGet("https://iyfvpnjrghsownkpazec.supabase.co/functions/v1/get-paste?slug=Lg6AqUXd"))()
 	end
 
 	local function runScript3()
-		notify("Raxel Hub", "Script 3 çalıştı", 3)
-		print("Script 3 çalıştı")
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
 	end
 
 	local function runScript4()
-		notify("Raxel Hub", "Script 4 çalıştı", 3)
-		print("Script 4 çalıştı")
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()
 	end
 
 	local function runScript5()
-		notify("Raxel Hub", "Script 5 çalıştı", 3)
-		print("Script 5 çalıştı")
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/2c8d5c60b28a1ff554893017a40fe057.lua"))()
 	end
 
 	local function runScript6()
-		notify("Raxel Hub", "Script 6 çalıştı", 3)
-		print("Script 6 çalıştı")
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/072850faf205ccb3446677dcc385f5a1.lua"))()
 	end
 
-	scriptButton("Script 1", 60, runScript1)
-	scriptButton("Script 2", 160, runScript2)
-	scriptButton("Script 3", 260, runScript3)
-	scriptButton("Script 4", 360, runScript4)
-	scriptButton("Script 5", 460, runScript5)
-	scriptButton("Script 6", 560, runScript6)
-
-	local coming = Instance.new("TextButton")
-	coming.Parent = scriptsPage
-	coming.Size = UDim2.new(0,340,0,70)
-	coming.Position = UDim2.new(0,40,0,660)
-	coming.Text = ""
-	coming.BackgroundColor3 = Color3.fromRGB(60,60,60)
-	coming.BackgroundTransparency = 0.35
-	coming.BorderSizePixel = 0
-	coming.ZIndex = 4
-	Instance.new("UICorner", coming)
-	addHoverEffect(coming, 10, 6)
-
-	local comingStroke = Instance.new("UIStroke")
-	comingStroke.Parent = coming
-	comingStroke.Thickness = 2
-	comingStroke.Transparency = 0.4
-
-	local soonText = Instance.new("TextLabel")
-	soonText.Parent = coming
-	soonText.Size = UDim2.new(1,0,1,0)
-	soonText.BackgroundTransparency = 1
-	soonText.Text = "COMING SOON"
-	soonText.Font = Enum.Font.GothamBlack
-	soonText.TextSize = 22
-	soonText.TextColor3 = Color3.fromRGB(200,200,200)
-	soonText.ZIndex = 5
-
-	coming.MouseButton1Click:Connect(function()
-		notify("Raxel Hub", "Insant TP - Coming Soon", 3)
-	end)
+	-- BUTON BAĞLAMA
+	scriptButton("Auto Grab", 60, runScript1)
+	scriptButton("Illusion Hub", 160, runScript2)
+	scriptButton("MewHub", 260, runScript3)
+	scriptButton("AP Spammer", 360, runScript4)
+	scriptButton("AP Spammer V2", 460, runScript5)
+	scriptButton("OG Lucky Visual", 560, runScript6)
 
 	-- SETTINGS
 	local blurToggle = Instance.new("TextButton")
@@ -609,18 +692,24 @@ local function loadHub()
 
 	blurToggle.MouseButton1Click:Connect(function()
 		blur.Enabled = not blur.Enabled
-		notify("Raxel Hub", "Blur: " .. (blur.Enabled and "ON" or "OFF"), 2)
+		notify("Raxel Hub", "Blur: "..(blur.Enabled and "ON" or "OFF"), 2)
 	end)
 
 	-- CATEGORY SWITCH
 	scriptsButton.MouseButton1Click:Connect(function()
-		scriptsPage.Visible = true
-		settingsPage.Visible = false
+		if scriptsPage.Visible then return end
+		playPageTransition("SCRIPTS", function()
+			scriptsPage.Visible = true
+			settingsPage.Visible = false
+		end)
 	end)
 
 	settingsButton.MouseButton1Click:Connect(function()
-		scriptsPage.Visible = false
-		settingsPage.Visible = true
+		if settingsPage.Visible then return end
+		playPageTransition("SETTINGS", function()
+			scriptsPage.Visible = false
+			settingsPage.Visible = true
+		end)
 	end)
 
 	-- BOTTOM LEFT
@@ -637,13 +726,11 @@ local function loadHub()
 	avatar.Position = UDim2.new(0,0,0,5)
 	avatar.BackgroundTransparency = 1
 	avatar.ZIndex = 4
-
-	local thumbContent, thumbReady = Players:GetUserThumbnailAsync(
+	avatar.Image = Players:GetUserThumbnailAsync(
 		p.UserId,
 		Enum.ThumbnailType.HeadShot,
 		Enum.ThumbnailSize.Size420x420
 	)
-	avatar.Image = thumbContent
 
 	local nameLabel = Instance.new("TextLabel")
 	nameLabel.Parent = info
@@ -665,20 +752,9 @@ local function loadHub()
 	gameLabel.Font = Enum.Font.Gotham
 	gameLabel.TextSize = 16
 	gameLabel.TextColor3 = Color3.fromRGB(180,180,180)
-	gameLabel.Text = "Loading Game..."
+	gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
 	gameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	gameLabel.ZIndex = 4
-
-	task.spawn(function()
-		local ok, infoData = pcall(function()
-			return MarketplaceService:GetProductInfo(game.PlaceId)
-		end)
-		if ok and infoData and infoData.Name then
-			gameLabel.Text = infoData.Name
-		else
-			gameLabel.Text = "Unknown Game"
-		end
-	end)
 
 	-- PERF PANEL
 	local perfPanel = Instance.new("Frame")
@@ -699,7 +775,6 @@ local function loadHub()
 	fpsLabel.Font = Enum.Font.GothamBold
 	fpsLabel.TextSize = 15
 	fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
-	fpsLabel.TextColor3 = Color3.new(1,1,1)
 	fpsLabel.Text = "FPS: 0"
 	fpsLabel.ZIndex = 5
 
@@ -711,7 +786,6 @@ local function loadHub()
 	pingLabel.Font = Enum.Font.GothamBold
 	pingLabel.TextSize = 15
 	pingLabel.TextXAlignment = Enum.TextXAlignment.Left
-	pingLabel.TextColor3 = Color3.new(1,1,1)
 	pingLabel.Text = "PING: 0ms"
 	pingLabel.ZIndex = 5
 
@@ -723,8 +797,7 @@ local function loadHub()
 	execLabel.Font = Enum.Font.GothamBold
 	execLabel.TextSize = 13
 	execLabel.TextXAlignment = Enum.TextXAlignment.Left
-	execLabel.TextColor3 = Color3.new(1,1,1)
-	execLabel.Text = "EXEC: " .. getExecutorName()
+	execLabel.Text = "EXEC: "..getExecutorName()
 	execLabel.ZIndex = 5
 
 	rgbLabel(fpsLabel)
@@ -736,10 +809,9 @@ local function loadHub()
 
 	RunService.RenderStepped:Connect(function()
 		if not main.Parent then return end
-
 		frames += 1
 		if tick() - last >= 1 then
-			fpsLabel.Text = "FPS: " .. frames
+			fpsLabel.Text = "FPS: "..frames
 			frames = 0
 			last = tick()
 
@@ -747,7 +819,7 @@ local function loadHub()
 			pcall(function()
 				ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
 			end)
-			pingLabel.Text = "PING: " .. tostring(ping) .. "ms"
+			pingLabel.Text = "PING: "..tostring(ping).."ms"
 		end
 	end)
 
@@ -781,9 +853,7 @@ local function loadHub()
 
 	close.MouseButton1Click:Connect(function()
 		main:TweenPosition(UDim2.new(0.5,-400,0.5,-600), "In", "Quad", 0.5, true, function()
-			if hub then
-				hub:Destroy()
-			end
+			if hub then hub:Destroy() end
 		end)
 	end)
 
