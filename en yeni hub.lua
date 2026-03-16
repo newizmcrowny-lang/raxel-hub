@@ -501,93 +501,20 @@ local function loadHub()
 	settingsPage.Visible = false
 	settingsPage.ZIndex = 3
 
-	-- SCRIPT BUTTONS
-	local function scriptButton(name, pos, func)
-		local b = Instance.new("TextButton")
-		b.Parent = scriptsPage
-		b.Size = UDim2.new(0,340,0,70)
-		b.Position = UDim2.new(0,40,0,pos)
-		b.Text = name
-		b.Font = Enum.Font.GothamBlack
-		b.TextSize = 24
-		b.TextColor3 = Color3.new(1,1,1)
-		b.BackgroundColor3 = Color3.fromRGB(45,45,45)
-		b.BorderSizePixel = 0
-		b.ZIndex = 4
-		Instance.new("UICorner", b)
-		b.MouseButton1Click:Connect(func)
-		rgbButton(b)
-		addHoverEffect(b, 10, 6)
-		return b
-	end
+-- SCRIPTS
+scriptButton("Script 1",120,function()
+loadstring(game:HttpGet("https://pastebin.com/raw/auSLpuqi"))()
+end)
 
-	local function runScript1()
-		notify("Raxel Hub", "Script 1 çalıştı", 3)
-		print("Script 1 çalıştı")
-	end
+scriptButton("Script 2",220,function()
+print("Script2")
+end)
 
-	local function runScript2()
-		notify("Raxel Hub", "Script 2 çalıştı", 3)
-		print("Script 2 çalıştı")
-	end
+scriptButton("Script 3",320,function()
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
+end)
 
-	local function runScript3()
-		notify("Raxel Hub", "Script 3 çalıştı", 3)
-		print("Script 3 çalıştı")
-	end
-
-	local function runScript4()
-		notify("Raxel Hub", "Script 4 çalıştı", 3)
-		print("Script 4 çalıştı")
-	end
-
-	local function runScript5()
-		notify("Raxel Hub", "Script 5 çalıştı", 3)
-		print("Script 5 çalıştı")
-	end
-
-	local function runScript6()
-		notify("Raxel Hub", "Script 6 çalıştı", 3)
-		print("Script 6 çalıştı")
-	end
-
-	scriptButton("Script 1", 60, runScript1)
-	scriptButton("Script 2", 160, runScript2)
-	scriptButton("Script 3", 260, runScript3)
-	scriptButton("Script 4", 360, runScript4)
-	scriptButton("Script 5", 460, runScript5)
-	scriptButton("Script 6", 560, runScript6)
-
-	local coming = Instance.new("TextButton")
-	coming.Parent = scriptsPage
-	coming.Size = UDim2.new(0,340,0,70)
-	coming.Position = UDim2.new(0,40,0,560)
-	coming.Text = ""
-	coming.BackgroundColor3 = Color3.fromRGB(60,60,60)
-	coming.BackgroundTransparency = 0.35
-	coming.BorderSizePixel = 0
-	coming.ZIndex = 4
-	Instance.new("UICorner", coming)
-	addHoverEffect(coming, 10, 6)
-
-	local comingStroke = Instance.new("UIStroke")
-	comingStroke.Parent = coming
-	comingStroke.Thickness = 2
-	comingStroke.Transparency = 0.4
-
-	local soonText = Instance.new("TextLabel")
-	soonText.Parent = coming
-	soonText.Size = UDim2.new(1,0,1,0)
-	soonText.BackgroundTransparency = 1
-	soonText.Text = "COMING SOON"
-	soonText.Font = Enum.Font.GothamBlack
-	soonText.TextSize = 22
-	soonText.TextColor3 = Color3.fromRGB(200,200,200)
-	soonText.ZIndex = 5
-
-	coming.MouseButton1Click:Connect(function()
-		notify("Raxel Hub", "Insant TP - Coming Soon", 3)
-	end)
+end
 
 	-- SETTINGS
 	local blurToggle = Instance.new("TextButton")
