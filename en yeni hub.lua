@@ -3,7 +3,7 @@
 
 -- SERVICES
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService");
+local UIS = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Stats = game:GetService("Stats")
@@ -155,7 +155,7 @@ local function checkKey(input)
 	end)
 
 	if ok and response then
-		for key in string.gmatch(response,"[^\r\n]+") do
+		for key in string.gmatch(response, "[^\r\n]+") do
 			if tostring(input) == key then
 				return true
 			end
@@ -166,9 +166,9 @@ local function checkKey(input)
 end
 
 -- CLEAN OLD GUI
-for _, gui in ipairs(p.PlayerGui:GetChildren()) do
-	if gui.Name == "RaxelKeyGui" or gui.Name == "RaxelHub" then
-		gui:Destroy()
+for _, guiObj in ipairs(p.PlayerGui:GetChildren()) do
+	if guiObj.Name == "RaxelKeyGui" or guiObj.Name == "RaxelHub" then
+		guiObj:Destroy()
 	end
 end
 
@@ -342,7 +342,9 @@ local function loadHub()
 			math.random(4,8),
 			true,
 			function()
-				if snow then snow:Destroy() end
+				if snow and snow.Parent then
+					snow:Destroy()
+				end
 			end
 		)
 	end
@@ -553,56 +555,7 @@ local function loadHub()
 
 	scriptButton("Script 1", 60, runScript1)
 	scriptButton("Script 2", 160, runScript2)
-	scriptButt	-- SCRIPT BUTTONS
-	local function scriptButton(name, pos, func)
-		local b = Instance.new("TextButton")
-		b.Parent = scriptsPage
-		b.Size = UDim2.new(0,340,0,70)
-		b.Position = UDim2.new(0,40,0,pos)
-		b.Text = name
-		b.Font = Enum.Font.GothamBlack
-		b.TextSize = 24
-		b.TextColor3 = Color3.new(1,1,1)
-		b.BackgroundColor3 = Color3.fromRGB(45,45,45)
-		b.BorderSizePixel = 0
-		b.ZIndex = 4
-		Instance.new("UICorner", b)
-		b.MouseButton1Click:Connect(func)
-		rgbButton(b)
-		addHoverEffect(b, 10, 6)
-		return b
-	end
-
-	local function runScript1()
-		notify("Raxel Hub", "Script 1 çalıştı", 3)
-		print("Script 1 çalıştı")
-	end
-
-	local function runScript2()
-		notify("Raxel Hub", "Script 2 çalıştı", 3)
-		print("Script 2 çalıştı")
-	end
-
-	local function runScript3()
-		notify("Raxel Hub", "Script 3 çalıştı", 3)
-		print("Script 3 çalıştı")
-	end
-
-	local function runScript4()
-		notify("Raxel Hub", "Script 4 çalıştı", 3)
-		print("Script 4 çalıştı")
-	end
-
-	local function runScript5()
-		notify("Raxel Hub", "Script 5 çalıştı", 3)
-		print("Script 5 çalıştı")
-	end
-
-	local function runScript6()
-		notify("Raxel Hub", "Script 6 çalıştı", 3)
-		print("Script 6 çalıştı")
-	end
-on("Script 3", 260, runScript3)
+	scriptButton("Script 3", 260, runScript3)
 	scriptButton("Script 4", 360, runScript4)
 	scriptButton("Script 5", 460, runScript5)
 	scriptButton("Script 6", 560, runScript6)
@@ -610,7 +563,7 @@ on("Script 3", 260, runScript3)
 	local coming = Instance.new("TextButton")
 	coming.Parent = scriptsPage
 	coming.Size = UDim2.new(0,340,0,70)
-	coming.Position = UDim2.new(0,40,0,560)
+	coming.Position = UDim2.new(0,40,0,660)
 	coming.Text = ""
 	coming.BackgroundColor3 = Color3.fromRGB(60,60,60)
 	coming.BackgroundTransparency = 0.35
@@ -656,7 +609,7 @@ on("Script 3", 260, runScript3)
 
 	blurToggle.MouseButton1Click:Connect(function()
 		blur.Enabled = not blur.Enabled
-		notify("Raxel Hub", "Blur: "..(blur.Enabled and "ON" or "OFF"), 2)
+		notify("Raxel Hub", "Blur: " .. (blur.Enabled and "ON" or "OFF"), 2)
 	end)
 
 	-- CATEGORY SWITCH
@@ -684,11 +637,13 @@ on("Script 3", 260, runScript3)
 	avatar.Position = UDim2.new(0,0,0,5)
 	avatar.BackgroundTransparency = 1
 	avatar.ZIndex = 4
-	avatar.Image = Players:GetUserThumbnailAsync(
+
+	local thumbContent, thumbReady = Players:GetUserThumbnailAsync(
 		p.UserId,
 		Enum.ThumbnailType.HeadShot,
 		Enum.ThumbnailSize.Size420x420
 	)
+	avatar.Image = thumbContent
 
 	local nameLabel = Instance.new("TextLabel")
 	nameLabel.Parent = info
@@ -710,9 +665,20 @@ on("Script 3", 260, runScript3)
 	gameLabel.Font = Enum.Font.Gotham
 	gameLabel.TextSize = 16
 	gameLabel.TextColor3 = Color3.fromRGB(180,180,180)
-	gameLabel.Text = MarketplaceService:GetProductInfo(game.PlaceId).Name
+	gameLabel.Text = "Loading Game..."
 	gameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	gameLabel.ZIndex = 4
+
+	task.spawn(function()
+		local ok, infoData = pcall(function()
+			return MarketplaceService:GetProductInfo(game.PlaceId)
+		end)
+		if ok and infoData and infoData.Name then
+			gameLabel.Text = infoData.Name
+		else
+			gameLabel.Text = "Unknown Game"
+		end
+	end)
 
 	-- PERF PANEL
 	local perfPanel = Instance.new("Frame")
@@ -733,6 +699,7 @@ on("Script 3", 260, runScript3)
 	fpsLabel.Font = Enum.Font.GothamBold
 	fpsLabel.TextSize = 15
 	fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
+	fpsLabel.TextColor3 = Color3.new(1,1,1)
 	fpsLabel.Text = "FPS: 0"
 	fpsLabel.ZIndex = 5
 
@@ -744,6 +711,7 @@ on("Script 3", 260, runScript3)
 	pingLabel.Font = Enum.Font.GothamBold
 	pingLabel.TextSize = 15
 	pingLabel.TextXAlignment = Enum.TextXAlignment.Left
+	pingLabel.TextColor3 = Color3.new(1,1,1)
 	pingLabel.Text = "PING: 0ms"
 	pingLabel.ZIndex = 5
 
@@ -755,7 +723,8 @@ on("Script 3", 260, runScript3)
 	execLabel.Font = Enum.Font.GothamBold
 	execLabel.TextSize = 13
 	execLabel.TextXAlignment = Enum.TextXAlignment.Left
-	execLabel.Text = "EXEC: "..getExecutorName()
+	execLabel.TextColor3 = Color3.new(1,1,1)
+	execLabel.Text = "EXEC: " .. getExecutorName()
 	execLabel.ZIndex = 5
 
 	rgbLabel(fpsLabel)
@@ -767,9 +736,10 @@ on("Script 3", 260, runScript3)
 
 	RunService.RenderStepped:Connect(function()
 		if not main.Parent then return end
+
 		frames += 1
 		if tick() - last >= 1 then
-			fpsLabel.Text = "FPS: "..frames
+			fpsLabel.Text = "FPS: " .. frames
 			frames = 0
 			last = tick()
 
@@ -777,7 +747,7 @@ on("Script 3", 260, runScript3)
 			pcall(function()
 				ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
 			end)
-			pingLabel.Text = "PING: "..tostring(ping).."ms"
+			pingLabel.Text = "PING: " .. tostring(ping) .. "ms"
 		end
 	end)
 
@@ -811,7 +781,9 @@ on("Script 3", 260, runScript3)
 
 	close.MouseButton1Click:Connect(function()
 		main:TweenPosition(UDim2.new(0.5,-400,0.5,-600), "In", "Quad", 0.5, true, function()
-			if hub then hub:Destroy() end
+			if hub then
+				hub:Destroy()
+			end
 		end)
 	end)
 
