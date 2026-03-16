@@ -146,6 +146,8 @@ Instance.new("UICorner", frame)
 rgbBorder(frame, 6)
 
 local title = Instance.new("TextLabel")
+local keyCooldown = false
+local normalTitleText = "RAXEL HUB"
 title.Parent = frame
 title.Size = UDim2.new(1,0,0,40)
 title.Position = UDim2.new(0,0,0,0)
