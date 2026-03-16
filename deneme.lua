@@ -3,13 +3,15 @@
 
 -- SERVICES
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+local UIS = game:GetService("UserInputService");
+local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Stats = game:GetService("Stats")
 local MarketplaceService = game:GetService("MarketplaceService")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
-local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+
 local p = Players.LocalPlayer
 
 -- BLUR
@@ -54,23 +56,45 @@ local function rgbButton(button)
 	end)
 end
 
-local function shakeGui(obj)
-	local originalPos = obj.Position
+local function addHoverEffect(button, growX, growY)
+	growX = growX or 10
+	growY = growY or 6
 
-	for i = 1,8 do
-		local offset = (i % 2 == 0) and 10 or -10
+	local normalSize = button.Size
+	local normalPos = button.Position
+	local normalTransparency = button.BackgroundTransparency
 
-		obj.Position = UDim2.new(
-			originalPos.X.Scale,
-			originalPos.X.Offset + offset,
-			originalPos.Y.Scale,
-			originalPos.Y.Offset
-		)
+	local hoverSize = UDim2.new(
+		normalSize.X.Scale,
+		normalSize.X.Offset + growX,
+		normalSize.Y.Scale,
+		normalSize.Y.Offset + growY
+	)
 
-		task.wait(0.03)
-	end
+	local hoverPos = UDim2.new(
+		normalPos.X.Scale,
+		normalPos.X.Offset - math.floor(growX / 2),
+		normalPos.Y.Scale,
+		normalPos.Y.Offset - math.floor(growY / 2)
+	)
 
-	obj.Position = originalPos
+	local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, tweenInfo, {
+			Size = hoverSize,
+			Position = hoverPos,
+			BackgroundTransparency = math.max(0, normalTransparency - 0.08)
+		}):Play()
+	end)
+
+	button.MouseLeave:Connect(function()
+		TweenService:Create(button, tweenInfo, {
+			Size = normalSize,
+			Position = normalPos,
+			BackgroundTransparency = normalTransparency
+		}):Play()
+	end)
 end
 
 local function getExecutorName()
@@ -198,6 +222,7 @@ enter.TextColor3 = Color3.new(1,1,1)
 enter.BorderSizePixel = 0
 Instance.new("UICorner", enter)
 rgbButton(enter)
+addHoverEffect(enter, 12, 6)
 
 -- HUB LOAD
 local function loadHub()
@@ -416,6 +441,8 @@ local function loadHub()
 
 	rgbButton(scriptsButton)
 	rgbButton(settingsButton)
+	addHoverEffect(scriptsButton, 10, 6)
+	addHoverEffect(settingsButton, 10, 6)
 
 	-- HEADER BUTTONS
 	local minimize = Instance.new("TextButton")
@@ -431,6 +458,7 @@ local function loadHub()
 	minimize.ZIndex = 4
 	Instance.new("UICorner", minimize)
 	rgbButton(minimize)
+	addHoverEffect(minimize, 8, 4)
 
 	local close = Instance.new("TextButton")
 	close.Parent = header
@@ -444,8 +472,8 @@ local function loadHub()
 	close.BorderSizePixel = 0
 	close.ZIndex = 4
 	Instance.new("UICorner", close)
-	
 	rgbButton(close)
+	addHoverEffect(close, 8, 4)
 
 	local content = Instance.new("Frame")
 	content.Parent = main
@@ -461,7 +489,7 @@ local function loadHub()
 	scriptsPage.BackgroundTransparency = 1
 	scriptsPage.Visible = true
 	scriptsPage.ZIndex = 3
-	scriptsPage.CanvasSize = UDim2.new(0,0,0,670)
+	scriptsPage.CanvasSize = UDim2.new(0,0,0,760)
 	scriptsPage.ScrollBarThickness = 6
 	scriptsPage.BorderSizePixel = 0
 	scriptsPage.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -474,107 +502,75 @@ local function loadHub()
 	settingsPage.ZIndex = 3
 
 	-- SCRIPT BUTTONS
-	local function scriptButton(name, pos, func)
-		local b = Instance.new("TextButton")
-		b.Parent = scriptsPage
-		b.Size = UDim2.new(0,340,0,70)
-		b.Position = UDim2.new(0,40,0,pos)
-		b.Text = name
-		b.Font = Enum.Font.GothamBlack
-		b.TextSize = 24
-		b.TextColor3 = Color3.new(1,1,1)
-		b.BackgroundColor3 = Color3.fromRGB(45,45,45)
-		b.BorderSizePixel = 0
-		b.ZIndex = 4
-		Instance.new("UICorner", b)
-		b.MouseButton1Click:Connect(func)
-		rgbButton(b)
-		return b
-	end
 
-	scriptButton("AP Spammer",60,function()
-    local url = "loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()" -- BURAYA LINK
-    if url ~= "" then
-        loadstring(game:HttpGet(url))()
-    else
-        notify("Raxel Hub","AP Script Executed!",3)
-    end
-end)
+local function scriptButton(name, pos, func)
+	local b = Instance.new("TextButton")
+	b.Parent = scriptsPage
+	b.Size = UDim2.new(0,340,0,70)
+	b.Position = UDim2.new(0,40,0,pos)
+	b.Text = name
+	b.Font = Enum.Font.GothamBlack
+	b.TextSize = 24
+	b.TextColor3 = Color3.new(1,1,1)
+	b.BackgroundColor3 = Color3.fromRGB(45,45,45)
+	b.BorderSizePixel = 0
+	b.ZIndex = 4
+	Instance.new("UICorner", b)
 
-scriptButton("MewHub V2",160,function()
-    local url = "loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()" -- BURAYA LINK
-    if url ~= "" then
-        loadstring(game:HttpGet(url))()
-    else
-        notify("Raxel Hub","MewHub V2 Executed!",3)
-    end
-end)
+	b.MouseButton1Click:Connect(func)
 
-scriptButton("Auto Grab",260,function()
-    local url = "https://pastebin.com/raw/8Q5cD940" -- BURAYA LINK
-    if url ~= "" then
-        loadstring(game:HttpGet(url))()
-    else
-        notify("Raxel Hub","Auto Grab Executed!",3)
-    end
-end)
+	rgbButton(b)
+	addHoverEffect(b, 10, 6)
 
-scriptButton("AP Spammer V2",360,function()
-    local url = "loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/2c8d5c60b28a1ff554893017a40fe057.lua"))()" -- BURAYA LINK
-    if url ~= "" then
-        loadstring(game:HttpGet(url))()
-    else
-        notify("Raxel Hub","Ap Spammer V2 Executed!",3)
-    end
-end)
+	return b
+end
 
-scriptButton("Illusion Hub",460,function()
-    local url = "loadstring(game:HttpGet("https://iyfvpnjrghsownkpazec.supabase.co/functions/v1/get-paste?slug=Lg6AqUXd"))()" -- BURAYA LINK
-    if url ~= "" then
-        loadstring(game:HttpGet(url))()
-    else
-        notify("Raxel Hub","Illusion Hub Executed!",3)
-    end
-end)
+-- SCRIPT FONKSİYONLARI
 
-scriptButton("Coming Soon...",560,function()
-    local url = "" -- BURAYA LINK
-    if url ~= "" then
-        loadstring(game:HttpGet(url))()
-    else
-        notify("Raxel Hub","Insant TP Executed",3)
-    end
-end)
-	local coming = Instance.new("TextButton")
-	coming.Parent = scriptsPage
-	coming.Size = UDim2.new(0,340,0,70)
-	coming.Position = UDim2.new(0,40,0,560)
-	coming.Text = ""
-	coming.BackgroundColor3 = Color3.fromRGB(60,60,60)
-	coming.BackgroundTransparency = 0.35
-	coming.BorderSizePixel = 0
-	coming.ZIndex = 4
-	Instance.new("UICorner", coming)
+local function runScript1()
 
-	local comingStroke = Instance.new("UIStroke")
-	comingStroke.Parent = coming
-	comingStroke.Thickness = 2
-	comingStroke.Transparency = 0.4
+loadstring(game:HttpGet("https://pastebin.com/raw/8Q5cD940"))()
 
-	local soonText = Instance.new("TextLabel")
-	soonText.Parent = coming
-	soonText.Size = UDim2.new(1,0,1,0)
-	soonText.BackgroundTransparency = 1
-	soonText.Text = "COMING SOON"
-	soonText.Font = Enum.Font.GothamBlack
-	soonText.TextSize = 22
-	soonText.TextColor3 = Color3.fromRGB(200,200,200)
-	soonText.ZIndex = 5
+end
 
-	coming.MouseButton1Click:Connect(function()
-		notify("Raxel Hub", "Insant TP - Coming Soon", 3)
-	end)
+local function runScript2()
 
+loadstring(game:HttpGet("https://iyfvpnjrghsownkpazec.supabase.co/functions/v1/get-paste?slug=Lg6AqUXd"))()
+
+end
+
+local function runScript3()
+
+ loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
+
+end
+
+local function runScript4()
+
+loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()
+
+end
+
+local function runScript5()
+
+loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/2c8d5c60b28a1ff554893017a40fe057.lua"))()
+
+end
+
+local function runScript6()
+
+loadstring(game:HttpGet("https://pastebin.com/raw/uiL6beiB"))()
+
+end
+
+-- BUTON BAĞLAMA
+
+scriptButton("Auto Grab", 60, runScript1)
+scriptButton("Illusion Hub", 160, runScript2)
+scriptButton("MewHub", 260, runScript3)
+scriptButton("AP Spammer", 360, runScript4)
+scriptButton("AP Spammer V2", 460, runScript5)
+scriptButton("Coming Soon...", 560, runScript6)
 	-- SETTINGS
 	local blurToggle = Instance.new("TextButton")
 	blurToggle.Parent = settingsPage
@@ -589,6 +585,7 @@ end)
 	blurToggle.ZIndex = 4
 	Instance.new("UICorner", blurToggle)
 	rgbButton(blurToggle)
+	addHoverEffect(blurToggle, 10, 6)
 
 	blurToggle.MouseButton1Click:Connect(function()
 		blur.Enabled = not blur.Enabled
@@ -764,7 +761,5 @@ enter.MouseButton1Click:Connect(function()
 	else
 		title.Text = "INVALID KEY"
 		title.TextColor3 = Color3.fromRGB(255,60,60)
-
-		shakeGui(frame)		
 	end
 end)
