@@ -444,6 +444,7 @@ local function loadHub()
 	close.BorderSizePixel = 0
 	close.ZIndex = 4
 	Instance.new("UICorner", close)
+	
 	rgbButton(close)
 
 	local content = Instance.new("Frame")
