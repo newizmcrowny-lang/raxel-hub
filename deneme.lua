@@ -481,6 +481,7 @@ local function loadHub()
 	content.Position = UDim2.new(0,180,0,50)
 	content.BackgroundTransparency = 1
 	content.ZIndex = 3
+	content.ClipsDescendants = true
 
 	-- PAGES
 	local scriptsPage = Instance.new("ScrollingFrame")
@@ -501,76 +502,178 @@ local function loadHub()
 	settingsPage.Visible = false
 	settingsPage.ZIndex = 3
 
+	-- PAGE TRANSITION UI
+	local transitionFrame = Instance.new("Frame")
+	transitionFrame.Parent = content
+	transitionFrame.Size = UDim2.new(1,0,1,0)
+	transitionFrame.Position = UDim2.new(0,0,0,0)
+	transitionFrame.BackgroundColor3 = Color3.fromRGB(10,10,10)
+	transitionFrame.BackgroundTransparency = 1
+	transitionFrame.BorderSizePixel = 0
+	transitionFrame.Visible = false
+	transitionFrame.ZIndex = 20
+
+	local transitionGlow = Instance.new("Frame")
+	transitionGlow.Parent = transitionFrame
+	transitionGlow.Size = UDim2.new(0,0,1,0)
+	transitionGlow.Position = UDim2.new(0,0,0,0)
+	transitionGlow.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	transitionGlow.BackgroundTransparency = 0.15
+	transitionGlow.BorderSizePixel = 0
+	transitionGlow.ZIndex = 21
+
+	local transitionText = Instance.new("TextLabel")
+	transitionText.Parent = transitionFrame
+	transitionText.Size = UDim2.new(1,0,1,0)
+	transitionText.Position = UDim2.new(0,0,0,0)
+	transitionText.BackgroundTransparency = 1
+	transitionText.Text = ""
+	transitionText.Font = Enum.Font.GothamBlack
+	transitionText.TextSize = 34
+	transitionText.TextColor3 = Color3.new(1,1,1)
+	transitionText.TextTransparency = 1
+	transitionText.ZIndex = 22
+
+	task.spawn(function()
+		local h = 0
+		while transitionGlow and transitionGlow.Parent do
+			transitionGlow.BackgroundColor3 = Color3.fromHSV(h, 0.8, 1)
+			h += 0.01
+			if h > 1 then h = 0 end
+			task.wait()
+		end
+	end)
+
+	local switchingPage = false
+	local function playPageTransition(targetName, switchFunc)
+		if switchingPage then return end
+		switchingPage = true
+
+		transitionFrame.Visible = true
+		transitionFrame.BackgroundTransparency = 1
+		transitionGlow.Size = UDim2.new(0,0,1,0)
+		transitionGlow.Position = UDim2.new(0,0,0,0)
+		transitionText.TextTransparency = 1
+		transitionText.Text = targetName
+
+		local bgIn = TweenService:Create(
+			transitionFrame,
+			TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{BackgroundTransparency = 0.25}
+		)
+
+		local glowIn = TweenService:Create(
+			transitionGlow,
+			TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+			{Size = UDim2.new(1,0,1,0)}
+		)
+
+		local textIn = TweenService:Create(
+			transitionText,
+			TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{TextTransparency = 0}
+		)
+
+		bgIn:Play()
+		glowIn:Play()
+		textIn:Play()
+
+		task.wait(0.16)
+
+		if switchFunc then
+			switchFunc()
+		end
+
+		task.wait(0.06)
+
+		local textOut = TweenService:Create(
+			transitionText,
+			TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{TextTransparency = 1}
+		)
+
+		local glowOut = TweenService:Create(
+			transitionGlow,
+			TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+			{
+				Size = UDim2.new(0,0,1,0),
+				Position = UDim2.new(1,0,0,0)
+			}
+		)
+
+		local bgOut = TweenService:Create(
+			transitionFrame,
+			TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{BackgroundTransparency = 1}
+		)
+
+		textOut:Play()
+		glowOut:Play()
+		bgOut:Play()
+
+		task.wait(0.24)
+
+		transitionFrame.Visible = false
+		transitionGlow.Position = UDim2.new(0,0,0,0)
+		switchingPage = false
+	end
+
 	-- SCRIPT BUTTONS
+	local function scriptButton(name, pos, func)
+		local b = Instance.new("TextButton")
+		b.Parent = scriptsPage
+		b.Size = UDim2.new(0,340,0,70)
+		b.Position = UDim2.new(0,40,0,pos)
+		b.Text = name
+		b.Font = Enum.Font.GothamBlack
+		b.TextSize = 24
+		b.TextColor3 = Color3.new(1,1,1)
+		b.BackgroundColor3 = Color3.fromRGB(45,45,45)
+		b.BorderSizePixel = 0
+		b.ZIndex = 4
+		Instance.new("UICorner", b)
 
-local function scriptButton(name, pos, func)
-	local b = Instance.new("TextButton")
-	b.Parent = scriptsPage
-	b.Size = UDim2.new(0,340,0,70)
-	b.Position = UDim2.new(0,40,0,pos)
-	b.Text = name
-	b.Font = Enum.Font.GothamBlack
-	b.TextSize = 24
-	b.TextColor3 = Color3.new(1,1,1)
-	b.BackgroundColor3 = Color3.fromRGB(45,45,45)
-	b.BorderSizePixel = 0
-	b.ZIndex = 4
-	Instance.new("UICorner", b)
+		b.MouseButton1Click:Connect(func)
 
-	b.MouseButton1Click:Connect(func)
+		rgbButton(b)
+		addHoverEffect(b, 10, 6)
 
-	rgbButton(b)
-	addHoverEffect(b, 10, 6)
+		return b
+	end
 
-	return b
-end
+	-- SCRIPT FONKSİYONLARI
+	local function runScript1()
+		loadstring(game:HttpGet("https://pastebin.com/raw/8Q5cD940"))()
+	end
 
--- SCRIPT FONKSİYONLARI
+	local function runScript2()
+		loadstring(game:HttpGet("https://iyfvpnjrghsownkpazec.supabase.co/functions/v1/get-paste?slug=Lg6AqUXd"))()
+	end
 
-local function runScript1()
+	local function runScript3()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
+	end
 
-loadstring(game:HttpGet("https://pastebin.com/raw/8Q5cD940"))()
+	local function runScript4()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()
+	end
 
-end
+	local function runScript5()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/2c8d5c60b28a1ff554893017a40fe057.lua"))()
+	end
 
-local function runScript2()
+	local function runScript6()
+		loadstring(game:HttpGet("https://pastebin.com/raw/uiL6beiB"))()
+	end
 
-loadstring(game:HttpGet("https://iyfvpnjrghsownkpazec.supabase.co/functions/v1/get-paste?slug=Lg6AqUXd"))()
+	-- BUTON BAĞLAMA
+	scriptButton("Auto Grab", 60, runScript1)
+	scriptButton("Illusion Hub", 160, runScript2)
+	scriptButton("MewHub", 260, runScript3)
+	scriptButton("AP Spammer", 360, runScript4)
+	scriptButton("AP Spammer V2", 460, runScript5)
+	scriptButton("Coming Soon...", 560, runScript6)
 
-end
-
-local function runScript3()
-
- loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()
-
-end
-
-local function runScript4()
-
-loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()
-
-end
-
-local function runScript5()
-
-loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/2c8d5c60b28a1ff554893017a40fe057.lua"))()
-
-end
-
-local function runScript6()
-
-loadstring(game:HttpGet("https://pastebin.com/raw/uiL6beiB"))()
-
-end
-
--- BUTON BAĞLAMA
-
-scriptButton("Auto Grab", 60, runScript1)
-scriptButton("Illusion Hub", 160, runScript2)
-scriptButton("MewHub", 260, runScript3)
-scriptButton("AP Spammer", 360, runScript4)
-scriptButton("AP Spammer V2", 460, runScript5)
-scriptButton("Coming Soon...", 560, runScript6)
 	-- SETTINGS
 	local blurToggle = Instance.new("TextButton")
 	blurToggle.Parent = settingsPage
@@ -594,13 +697,19 @@ scriptButton("Coming Soon...", 560, runScript6)
 
 	-- CATEGORY SWITCH
 	scriptsButton.MouseButton1Click:Connect(function()
-		scriptsPage.Visible = true
-		settingsPage.Visible = false
+		if scriptsPage.Visible then return end
+		playPageTransition("SCRIPTS", function()
+			scriptsPage.Visible = true
+			settingsPage.Visible = false
+		end)
 	end)
 
 	settingsButton.MouseButton1Click:Connect(function()
-		scriptsPage.Visible = false
-		settingsPage.Visible = true
+		if settingsPage.Visible then return end
+		playPageTransition("SETTINGS", function()
+			scriptsPage.Visible = false
+			settingsPage.Visible = true
+		end)
 	end)
 
 	-- BOTTOM LEFT
