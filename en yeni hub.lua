@@ -123,7 +123,7 @@ local function rgbBorder(frameObj, thick)
 	end)
 end
 
-local KEY_URL = "https://pastebin.com/raw/fsZ7rBWj"
+local KEY_URL = "https://pastebin.com/raw/XCuDnRBT"
 
 local function checkKey(input)
 	local ok, response = pcall(function()
