@@ -492,26 +492,59 @@ local function loadHub()
 		return b
 	end
 
-	scriptButton("Illusion Hub",60,function()
-		notify("Raxel Hub", "Illusion Hub selected", 3)
-	end)
+	scriptButton("AP Spammer",60,function()
+    local url = "loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7b192046bb554ba98da6900b64fb63b5.lua"))()" -- BURAYA LINK
+    if url ~= "" then
+        loadstring(game:HttpGet(url))()
+    else
+        notify("Raxel Hub","AP Script Executed!",3)
+    end
+end)
 
-	scriptButton("MewHub",160,function()
-		notify("Raxel Hub", "MewHub selected", 3)
-	end)
+scriptButton("MewHub V2",160,function()
+    local url = "loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f6e40e83490bff819d3a3eabd8937a4b.lua"))()" -- BURAYA LINK
+    if url ~= "" then
+        loadstring(game:HttpGet(url))()
+    else
+        notify("Raxel Hub","MewHub V2 Executed!",3)
+    end
+end)
 
-	scriptButton("Auto Grab",260,function()
-		notify("Raxel Hub", "Auto Grab selected", 3)
-	end)
+scriptButton("Auto Grab",260,function()
+    local url = "https://pastebin.com/raw/8Q5cD940" -- BURAYA LINK
+    if url ~= "" then
+        loadstring(game:HttpGet(url))()
+    else
+        notify("Raxel Hub","Auto Grab Executed!",3)
+    end
+end)
 
-	scriptButton("AP Spammer",360,function()
-		notify("Raxel Hub", "AP Spammer selected", 3)
-	end)
+scriptButton("AP Spammer V2",360,function()
+    local url = "loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/2c8d5c60b28a1ff554893017a40fe057.lua"))()" -- BURAYA LINK
+    if url ~= "" then
+        loadstring(game:HttpGet(url))()
+    else
+        notify("Raxel Hub","Ap Spammer V2 Executed!",3)
+    end
+end)
 
-	scriptButton("Auto Bat",460,function()
-		notify("Raxel Hub", "Auto Bat selected", 3)
-	end)
+scriptButton("Illusion Hub",460,function()
+    local url = "loadstring(game:HttpGet("https://iyfvpnjrghsownkpazec.supabase.co/functions/v1/get-paste?slug=Lg6AqUXd"))()" -- BURAYA LINK
+    if url ~= "" then
+        loadstring(game:HttpGet(url))()
+    else
+        notify("Raxel Hub","Illusion Hub Executed!",3)
+    end
+end)
 
+scriptButton("Coming Soon...",560,function()
+    local url = "" -- BURAYA LINK
+    if url ~= "" then
+        loadstring(game:HttpGet(url))()
+    else
+        notify("Raxel Hub","Insant TP Executed",3)
+    end
+end)
 	local coming = Instance.new("TextButton")
 	coming.Parent = scriptsPage
 	coming.Size = UDim2.new(0,340,0,70)
