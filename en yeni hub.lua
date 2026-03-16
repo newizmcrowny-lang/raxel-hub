@@ -162,29 +162,28 @@ local function rgbBorder(frameObj, thick)
 end
 
 local validKeys = {
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
+	["laxecanbabafingo"] = true,
+	["E3FJASDD35EDSXFGHER"] = true,
+	["SKKJ3J56431DSDKH543"] = true,
+	["PEW55543WJSDSFFD355"] = true,
+	["GJS8835RSRHCXFFGY33"] = true,
+	["DSHJK46833DSDGXGGG5"] = true,
+	["035SDGAGXXGT4I37233"] = true,
+	["DDAS675IHGSADG36666"] = true,
+	["PASDHG358883SBADFGD"] = true,
+	["DASY355DJASXXGGKDD3"] = true,
 
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true,
-	[""] = true
+	["35JASDXXXRU4J334ASD"] = true,
+	["DASJK3K5HGASFD35877"] = true,
+	["SKADK3H5G83835KSADH"] = true,
+	["LSALDJ3G57312JASJD3"] = true,
+	["DASUDASYU38734JASD3"] = true,
+	["3Y5837ASJDJVJGJAWXX"] = true,
+	["SAJDASH35GR6AUSDJXW"] = true,
+	["DIASGDUFAS3453I4HAS"] = true,
+	["SDAHH3577ASDJKXT3X3"] = true,
+	["XSAHG3G53G738053SXA"] = true
 }
-Örnek doldurma
 
 local function checkKey(input)
 	return validKeys[tostring(input)] == true
