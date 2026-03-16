@@ -162,10 +162,29 @@ local function rgbBorder(frameObj, thick)
 end
 
 local validKeys = {
-	["RAXEL1"] = true,
-	["RAXEL2"] = true,
-	["VIPKEY"] = true
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true,
+	[""] = true
 }
+Örnek doldurma
 
 local function checkKey(input)
 	return validKeys[tostring(input)] == true
