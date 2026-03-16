@@ -104,8 +104,22 @@ local function rgbBorder(frameObj, thick)
 	end)
 end
 
-local function fakeKeyCheck(input)
-	return tostring(input) == "RAXEL"
+local KEY_URL = "https://pastebin.com/raw/fsZ7rBWj"
+
+local function checkKey(input)
+	local ok, response = pcall(function()
+		return game:HttpGet(KEY_URL)
+	end)
+
+	if ok and response then
+		for key in string.gmatch(response,"[^\r\n]+") do
+			if tostring(input) == key then
+				return true
+			end
+		end
+	end
+
+	return false
 end
 
 -- CLEAN OLD GUI
@@ -689,7 +703,7 @@ end
 
 -- KEY TRY
 enter.MouseButton1Click:Connect(function()
-	if fakeKeyCheck(box.Text) then
+	if checkKey(box.Text) then
 		frame:TweenPosition(UDim2.new(0.5,-400,-0.5,-260), "Out", "Quad", 0.5, true, function()
 			gui:Destroy()
 			loadHub()
