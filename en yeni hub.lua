@@ -754,7 +754,7 @@ end
 
 -- KEY TRY
 enter.MouseButton1Click:Connect(function()
-	if fakeKeyCheck(box.Text) then
+	if checkKey(box.Text) then
 		frame:TweenPosition(UDim2.new(0.5,-400,-0.5,-260), "Out", "Quad", 0.5, true, function()
 			gui:Destroy()
 			loadHub()
