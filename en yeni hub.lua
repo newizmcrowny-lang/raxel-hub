@@ -147,8 +147,22 @@ local function rgbBorder(frameObj, thick)
 	end)
 end
 
-local function fakeKeyCheck(input)
-	return tostring(input) == "RAXEL"
+local KEY_URL = "https://pastebin.com/raw/XCuDnRBT"
+
+local function checkKey(input)
+	local ok, response = pcall(function()
+		return game:HttpGet(KEY_URL)
+	end)
+
+	if ok and response then
+		for key in string.gmatch(response,"[^\r\n]+") do
+			if tostring(input) == key then
+				return true
+			end
+		end
+	end
+
+	return false
 end
 
 -- CLEAN OLD GUI
