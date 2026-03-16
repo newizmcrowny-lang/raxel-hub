@@ -9,7 +9,8 @@ local Stats = game:GetService("Stats")
 local MarketplaceService = game:GetService("MarketplaceService")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
-local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+
 local p = Players.LocalPlayer
 
 -- BLUR
@@ -54,22 +55,59 @@ local function rgbButton(button)
 	end)
 end
 
+local function addHoverEffect(button, growX, growY)
+	growX = growX or 10
+	growY = growY or 6
+
+	local normalSize = button.Size
+	local normalPos = button.Position
+	local normalTransparency = button.BackgroundTransparency
+
+	local hoverSize = UDim2.new(
+		normalSize.X.Scale,
+		normalSize.X.Offset + growX,
+		normalSize.Y.Scale,
+		normalSize.Y.Offset + growY
+	)
+
+	local hoverPos = UDim2.new(
+		normalPos.X.Scale,
+		normalPos.X.Offset - math.floor(growX / 2),
+		normalPos.Y.Scale,
+		normalPos.Y.Offset - math.floor(growY / 2)
+	)
+
+	local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, tweenInfo, {
+			Size = hoverSize,
+			Position = hoverPos,
+			BackgroundTransparency = math.max(0, normalTransparency - 0.08)
+		}):Play()
+	end)
+
+	button.MouseLeave:Connect(function()
+		TweenService:Create(button, tweenInfo, {
+			Size = normalSize,
+			Position = normalPos,
+			BackgroundTransparency = normalTransparency
+		}):Play()
+	end)
+end
+
 local function shakeGui(obj)
 	local originalPos = obj.Position
-
-	for i = 1,8 do
+	for i = 1, 8 do
 		local offset = (i % 2 == 0) and 10 or -10
-
 		obj.Position = UDim2.new(
 			originalPos.X.Scale,
 			originalPos.X.Offset + offset,
 			originalPos.Y.Scale,
 			originalPos.Y.Offset
 		)
-
 		task.wait(0.03)
 	end
-
 	obj.Position = originalPos
 end
 
@@ -123,28 +161,14 @@ local function rgbBorder(frameObj, thick)
 	end)
 end
 
-local KEY_URL = "https://pastebin.com/raw/XCuDnRBT"
-
-local function checkKey(input)
-	local ok, response = pcall(function()
-		return game:HttpGet(KEY_URL)
-	end)
-
-	if ok and response then
-		for key in string.gmatch(response,"[^\r\n]+") do
-			if tostring(input) == key then
-				return true
-			end
-		end
-	end
-
-	return false
+local function fakeKeyCheck(input)
+	return tostring(input) == "RAXEL"
 end
 
 -- CLEAN OLD GUI
-for _, gui in ipairs(p.PlayerGui:GetChildren()) do
-	if gui.Name == "RaxelKeyGui" or gui.Name == "RaxelHub" then
-		gui:Destroy()
+for _, oldGui in ipairs(p.PlayerGui:GetChildren()) do
+	if oldGui.Name == "RaxelKeyGui" or oldGui.Name == "RaxelHub" then
+		oldGui:Destroy()
 	end
 end
 
@@ -178,7 +202,7 @@ local box = Instance.new("TextBox")
 box.Parent = frame
 box.Size = UDim2.new(0.8,0,0,50)
 box.Position = UDim2.new(0.1,0,0.45,0)
-box.PlaceholderText = "Enter Key"
+box.PlaceholderText = "Enter Key (Demo key: RAXEL)"
 box.BackgroundColor3 = Color3.fromRGB(40,40,40)
 box.TextColor3 = Color3.new(1,1,1)
 box.Font = Enum.Font.GothamBlack
@@ -198,6 +222,7 @@ enter.TextColor3 = Color3.new(1,1,1)
 enter.BorderSizePixel = 0
 Instance.new("UICorner", enter)
 rgbButton(enter)
+addHoverEffect(enter, 12, 6)
 
 -- HUB LOAD
 local function loadHub()
@@ -284,7 +309,6 @@ local function loadHub()
 	local isMinimized = false
 	local hubVisible = true
 
-	-- RightShift toggle
 	UIS.InputBegan:Connect(function(input, gp)
 		if gp then return end
 		if input.KeyCode == Enum.KeyCode.RightShift then
@@ -416,6 +440,8 @@ local function loadHub()
 
 	rgbButton(scriptsButton)
 	rgbButton(settingsButton)
+	addHoverEffect(scriptsButton, 10, 6)
+	addHoverEffect(settingsButton, 10, 6)
 
 	-- HEADER BUTTONS
 	local minimize = Instance.new("TextButton")
@@ -431,6 +457,7 @@ local function loadHub()
 	minimize.ZIndex = 4
 	Instance.new("UICorner", minimize)
 	rgbButton(minimize)
+	addHoverEffect(minimize, 8, 4)
 
 	local close = Instance.new("TextButton")
 	close.Parent = header
@@ -444,8 +471,8 @@ local function loadHub()
 	close.BorderSizePixel = 0
 	close.ZIndex = 4
 	Instance.new("UICorner", close)
-	
 	rgbButton(close)
+	addHoverEffect(close, 8, 4)
 
 	local content = Instance.new("Frame")
 	content.Parent = main
@@ -454,14 +481,13 @@ local function loadHub()
 	content.BackgroundTransparency = 1
 	content.ZIndex = 3
 
-	-- PAGES
 	local scriptsPage = Instance.new("ScrollingFrame")
 	scriptsPage.Parent = content
 	scriptsPage.Size = UDim2.new(1,0,1,0)
 	scriptsPage.BackgroundTransparency = 1
 	scriptsPage.Visible = true
 	scriptsPage.ZIndex = 3
-	scriptsPage.CanvasSize = UDim2.new(0,0,0,670)
+	scriptsPage.CanvasSize = UDim2.new(0,0,0,760)
 	scriptsPage.ScrollBarThickness = 6
 	scriptsPage.BorderSizePixel = 0
 	scriptsPage.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -473,7 +499,6 @@ local function loadHub()
 	settingsPage.Visible = false
 	settingsPage.ZIndex = 3
 
-	-- SCRIPT BUTTONS
 	local function scriptButton(name, pos, func)
 		local b = Instance.new("TextButton")
 		b.Parent = scriptsPage
@@ -489,6 +514,7 @@ local function loadHub()
 		Instance.new("UICorner", b)
 		b.MouseButton1Click:Connect(func)
 		rgbButton(b)
+		addHoverEffect(b, 10, 6)
 		return b
 	end
 
@@ -522,6 +548,7 @@ local function loadHub()
 	coming.BorderSizePixel = 0
 	coming.ZIndex = 4
 	Instance.new("UICorner", coming)
+	addHoverEffect(coming, 10, 6)
 
 	local comingStroke = Instance.new("UIStroke")
 	comingStroke.Parent = coming
@@ -556,13 +583,13 @@ local function loadHub()
 	blurToggle.ZIndex = 4
 	Instance.new("UICorner", blurToggle)
 	rgbButton(blurToggle)
+	addHoverEffect(blurToggle, 10, 6)
 
 	blurToggle.MouseButton1Click:Connect(function()
 		blur.Enabled = not blur.Enabled
 		notify("Raxel Hub", "Blur: "..(blur.Enabled and "ON" or "OFF"), 2)
 	end)
 
-	-- CATEGORY SWITCH
 	scriptsButton.MouseButton1Click:Connect(function()
 		scriptsPage.Visible = true
 		settingsPage.Visible = false
@@ -684,7 +711,6 @@ local function loadHub()
 		end
 	end)
 
-	-- MINIMIZE
 	local function setMinimized(state)
 		isMinimized = state
 		if state then
@@ -723,7 +749,7 @@ end
 
 -- KEY TRY
 enter.MouseButton1Click:Connect(function()
-	if checkKey(box.Text) then
+	if fakeKeyCheck(box.Text) then
 		frame:TweenPosition(UDim2.new(0.5,-400,-0.5,-260), "Out", "Quad", 0.5, true, function()
 			gui:Destroy()
 			loadHub()
@@ -731,7 +757,6 @@ enter.MouseButton1Click:Connect(function()
 	else
 		title.Text = "INVALID KEY"
 		title.TextColor3 = Color3.fromRGB(255,60,60)
-
-		shakeGui(frame)		
+		shakeGui(frame)
 	end
 end)
