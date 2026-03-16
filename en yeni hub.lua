@@ -730,5 +730,7 @@ enter.MouseButton1Click:Connect(function()
 	else
 		title.Text = "INVALID KEY"
 		title.TextColor3 = Color3.fromRGB(255,60,60)
+
+		shakeGui(frame)		
 	end
 end)
