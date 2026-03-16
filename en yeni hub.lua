@@ -489,7 +489,7 @@ local function loadHub()
 	scriptsPage.BackgroundTransparency = 1
 	scriptsPage.Visible = true
 	scriptsPage.ZIndex = 3
-	scriptsPage.CanvasSize = UDim2.new(0,0,0,670)
+	scriptsPage.CanvasSize = UDim2.new(0,0,0,760)
 	scriptsPage.ScrollBarThickness = 6
 	scriptsPage.BorderSizePixel = 0
 	scriptsPage.ScrollingDirection = Enum.ScrollingDirection.Y
