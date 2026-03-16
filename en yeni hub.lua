@@ -54,6 +54,25 @@ local function rgbButton(button)
 	end)
 end
 
+local function shakeGui(obj)
+	local originalPos = obj.Position
+
+	for i = 1,8 do
+		local offset = (i % 2 == 0) and 10 or -10
+
+		obj.Position = UDim2.new(
+			originalPos.X.Scale,
+			originalPos.X.Offset + offset,
+			originalPos.Y.Scale,
+			originalPos.Y.Offset
+		)
+
+		task.wait(0.03)
+	end
+
+	obj.Position = originalPos
+end
+
 local function getExecutorName()
 	local ok, result = pcall(function()
 		if identifyexecutor then
