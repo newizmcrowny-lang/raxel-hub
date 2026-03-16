@@ -521,25 +521,42 @@ local function loadHub()
 		return b
 	end
 
-	scriptButton("Illusion Hub",60,function()
-		notify("Raxel Hub", "Illusion Hub selected", 3)
-	end)
+	local function runScript1()
+		notify("Raxel Hub", "Script 1 çalıştı", 3)
+		print("Script 1 çalıştı")
+	end
 
-	scriptButton("MewHub",160,function()
-		notify("Raxel Hub", "MewHub selected", 3)
-	end)
+	local function runScript2()
+		notify("Raxel Hub", "Script 2 çalıştı", 3)
+		print("Script 2 çalıştı")
+	end
 
-	scriptButton("Auto Grab",260,function()
-		notify("Raxel Hub", "Auto Grab selected", 3)
-	end)
+	local function runScript3()
+		notify("Raxel Hub", "Script 3 çalıştı", 3)
+		print("Script 3 çalıştı")
+	end
 
-	scriptButton("AP Spammer",360,function()
-		notify("Raxel Hub", "AP Spammer selected", 3)
-	end)
+	local function runScript4()
+		notify("Raxel Hub", "Script 4 çalıştı", 3)
+		print("Script 4 çalıştı")
+	end
 
-	scriptButton("Auto Bat",460,function()
-		notify("Raxel Hub", "Auto Bat selected", 3)
-	end)
+	local function runScript5()
+		notify("Raxel Hub", "Script 5 çalıştı", 3)
+		print("Script 5 çalıştı")
+	end
+
+	local function runScript6()
+		notify("Raxel Hub", "Script 6 çalıştı", 3)
+		print("Script 6 çalıştı")
+	end
+
+	scriptButton("Script 1", 60, runScript1)
+	scriptButton("Script 2", 160, runScript2)
+	scriptButton("Script 3", 260, runScript3)
+	scriptButton("Script 4", 360, runScript4)
+	scriptButton("Script 5", 460, runScript5)
+	scriptButton("Script 6", 560, runScript6)
 
 	local coming = Instance.new("TextButton")
 	coming.Parent = scriptsPage
