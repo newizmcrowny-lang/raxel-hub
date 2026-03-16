@@ -663,7 +663,7 @@ local function loadHub()
 	end
 
 	local function runScript6()
-		loadstring(game:HttpGet("https://pastebin.com/raw/uiL6beiB"))()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/072850faf205ccb3446677dcc385f5a1.lua"))
 	end
 
 	-- BUTON BAĞLAMA
@@ -672,7 +672,7 @@ local function loadHub()
 	scriptButton("MewHub", 260, runScript3)
 	scriptButton("AP Spammer", 360, runScript4)
 	scriptButton("AP Spammer V2", 460, runScript5)
-	scriptButton("Coming Soon...", 560, runScript6)
+	scriptButton("OG Lucky Visual", 560, runScript6)
 
 	-- SETTINGS
 	local blurToggle = Instance.new("TextButton")
