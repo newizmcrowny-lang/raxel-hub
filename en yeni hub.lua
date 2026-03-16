@@ -96,21 +96,6 @@ local function addHoverEffect(button, growX, growY)
 	end)
 end
 
-local function shakeGui(obj)
-	local originalPos = obj.Position
-	for i = 1, 8 do
-		local offset = (i % 2 == 0) and 10 or -10
-		obj.Position = UDim2.new(
-			originalPos.X.Scale,
-			originalPos.X.Offset + offset,
-			originalPos.Y.Scale,
-			originalPos.Y.Offset
-		)
-		task.wait(0.03)
-	end
-	obj.Position = originalPos
-end
-
 local function getExecutorName()
 	local ok, result = pcall(function()
 		if identifyexecutor then
@@ -161,37 +146,14 @@ local function rgbBorder(frameObj, thick)
 	end)
 end
 
-local validKeys = {
-	["laxecanbabafingo"] = true,
-	["E3FJASDD35EDSXFGHER"] = true,
-	["SKKJ3J56431DSDKH543"] = true,
-	["PEW55543WJSDSFFD355"] = true,
-	["GJS8835RSRHCXFFGY33"] = true,
-	["DSHJK46833DSDGXGGG5"] = true,
-	["035SDGAGXXGT4I37233"] = true,
-	["DDAS675IHGSADG36666"] = true,
-	["PASDHG358883SBADFGD"] = true,
-	["DASY355DJASXXGGKDD3"] = true,
-
-	["35JASDXXXRU4J334ASD"] = true,
-	["DASJK3K5HGASFD35877"] = true,
-	["SKADK3H5G83835KSADH"] = true,
-	["LSALDJ3G57312JASJD3"] = true,
-	["DASUDASYU38734JASD3"] = true,
-	["3Y5837ASJDJVJGJAWXX"] = true,
-	["SAJDASH35GR6AUSDJXW"] = true,
-	["DIASGDUFAS3453I4HAS"] = true,
-	["SDAHH3577ASDJKXT3X3"] = true,
-	["XSAHG3G53G738053SXA"] = true
-}
-
-local function checkKey(input)
-	return validKeys[tostring(input)] == true
+local function fakeKeyCheck(input)
+	return tostring(input) == "RAXEL"
 end
+
 -- CLEAN OLD GUI
-for _, oldGui in ipairs(p.PlayerGui:GetChildren()) do
-	if oldGui.Name == "RaxelKeyGui" or oldGui.Name == "RaxelHub" then
-		oldGui:Destroy()
+for _, gui in ipairs(p.PlayerGui:GetChildren()) do
+	if gui.Name == "RaxelKeyGui" or gui.Name == "RaxelHub" then
+		gui:Destroy()
 	end
 end
 
@@ -332,6 +294,7 @@ local function loadHub()
 	local isMinimized = false
 	local hubVisible = true
 
+	-- RightShift toggle
 	UIS.InputBegan:Connect(function(input, gp)
 		if gp then return end
 		if input.KeyCode == Enum.KeyCode.RightShift then
@@ -504,13 +467,14 @@ local function loadHub()
 	content.BackgroundTransparency = 1
 	content.ZIndex = 3
 
+	-- PAGES
 	local scriptsPage = Instance.new("ScrollingFrame")
 	scriptsPage.Parent = content
 	scriptsPage.Size = UDim2.new(1,0,1,0)
 	scriptsPage.BackgroundTransparency = 1
 	scriptsPage.Visible = true
 	scriptsPage.ZIndex = 3
-	scriptsPage.CanvasSize = UDim2.new(0,0,0,760)
+	scriptsPage.CanvasSize = UDim2.new(0,0,0,670)
 	scriptsPage.ScrollBarThickness = 6
 	scriptsPage.BorderSizePixel = 0
 	scriptsPage.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -522,6 +486,7 @@ local function loadHub()
 	settingsPage.Visible = false
 	settingsPage.ZIndex = 3
 
+	-- SCRIPT BUTTONS
 	local function scriptButton(name, pos, func)
 		local b = Instance.new("TextButton")
 		b.Parent = scriptsPage
@@ -613,6 +578,7 @@ local function loadHub()
 		notify("Raxel Hub", "Blur: "..(blur.Enabled and "ON" or "OFF"), 2)
 	end)
 
+	-- CATEGORY SWITCH
 	scriptsButton.MouseButton1Click:Connect(function()
 		scriptsPage.Visible = true
 		settingsPage.Visible = false
@@ -734,6 +700,7 @@ local function loadHub()
 		end
 	end)
 
+	-- MINIMIZE
 	local function setMinimized(state)
 		isMinimized = state
 		if state then
@@ -780,6 +747,5 @@ enter.MouseButton1Click:Connect(function()
 	else
 		title.Text = "INVALID KEY"
 		title.TextColor3 = Color3.fromRGB(255,60,60)
-		shakeGui(frame)
 	end
 end)
