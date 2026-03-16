@@ -161,10 +161,15 @@ local function rgbBorder(frameObj, thick)
 	end)
 end
 
-local function fakeKeyCheck(input)
-	return tostring(input) == "RAXEL"
-end
+local validKeys = {
+	["RAXEL1"] = true,
+	["RAXEL2"] = true,
+	["VIPKEY"] = true
+}
 
+local function checkKey(input)
+	return validKeys[tostring(input)] == true
+end
 -- CLEAN OLD GUI
 for _, oldGui in ipairs(p.PlayerGui:GetChildren()) do
 	if oldGui.Name == "RaxelKeyGui" or oldGui.Name == "RaxelHub" then
