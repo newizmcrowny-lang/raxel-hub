@@ -235,12 +235,29 @@ ProximityPromptService.PromptTriggered:Connect(function(prompt, playerWhoTrigger
 end)
 
 QuickBlockGUI.MouseButton1Click:Connect(triggerRobloxBlock)
-Toggle.MouseButton1Click:Connect(function() Container.Visible = not Container.Visible end)
-KeybindBtn.MouseButton1Click:Connect(function() isBinding = true; KeybindBtn.Text = "..." end)
+
+Toggle.MouseButton1Click:Connect(function()
+	Container.Visible = not Container.Visible
+end)
+
+KeybindBtn.MouseButton1Click:Connect(function()
+	isBinding = true
+	KeybindBtn.Text = "Press a key..."
+end)
+
 TeleportBtn.MouseButton1Click:Connect(RunPath)
-AutoBlockBtn.MouseButton1Click:Connect(function() toggleState(AutoBlockBtn, "AutoBlock", "Auto Block") end)
-QuickAccessBtn.MouseButton1Click:Connect(function() toggleState(QuickAccessBtn, "QuickAccess", "Quick Access") end)
-InvisBtn.MouseButton1Click:Connect(function() toggleState(InvisBtn, "InvisOnFinish", "Invis Finish") end)
+
+AutoBlockBtn.MouseButton1Click:Connect(function()
+	toggleState(AutoBlockBtn, "Auto Block", "Auto Block")
+end)
+
+QuickAccessBtn.MouseButton1Click:Connect(function()
+	toggleState(QuickAccessBtn, "QuickAccess", "Quick Access")
+end)
+
+InvisBtn.MouseButton1Click:Connect(function()
+	toggleState(InvisBtn, "InvisOnFinish", "Invis Finish")
+end)
 
 UserInputService.InputBegan:Connect(function(input, processed)
 	-- TUŞ SEÇERKEN başka şeyleri engelle
