@@ -243,11 +243,20 @@ QuickAccessBtn.MouseButton1Click:Connect(function() toggleState(QuickAccessBtn, 
 InvisBtn.MouseButton1Click:Connect(function() toggleState(InvisBtn, "InvisOnFinish", "Invis Finish") end)
 
 UserInputService.InputBegan:Connect(function(input, processed)
-	if isBinding and input.UserInputType == Enum.UserInputType.Keyboard then
-		currentKeybind = input.KeyCode
-		KeybindBtn.Text = "Key: " .. currentKeybind.Name
-		isBinding = false
-	elseif not processed and input.KeyCode == currentKeybind then
+	-- TUŞ SEÇERKEN başka şeyleri engelle
+	if isBinding then
+		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Unknown then
+			currentKeybind = input.KeyCode
+			KeybindBtn.Text = "Key: " .. currentKeybind.Name
+			isBinding = false
+		end
+		return
+	end
+
+	if processed then return end
+
+	-- SEÇİLEN TUŞA BASINCA
+	if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == currentKeybind then
 		RunPath()
 	end
 end)
