@@ -131,7 +131,7 @@ local overlay = Instance.new("Frame")
 overlay.Parent = gui
 overlay.Size = UDim2.new(1,0,1,0)
 overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
-overlay.BackgroundTransparency = 0.35
+overlay.BackgroundTransparency = 1
 overlay.BorderSizePixel = 0
 
 local main = Instance.new("Frame")
