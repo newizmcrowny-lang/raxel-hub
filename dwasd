@@ -1,281 +1,402 @@
--- leaked by discord.gg/tokinu
-print("smd calmet discord.gg/raxelhub")
+-- RAXEL HUB | SAFE UI
+-- LocalScript olarak kullan
+
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local ProximityPromptService = game:GetService("ProximityPromptService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
 local StarterGui = game:GetService("StarterGui")
-local GuiService = game:GetService("GuiService")
-local Player = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
 
--- CONFIGURATION
-local TARGET_TOOL = "Flying Carpet"
-local INVIS_TOOL = "Invisibility Cloak"
-local TELEPORT_DELAY = 0.18
-local SAFETY_DELAY = 0.2 -- Reduced for faster activation
-local DEFAULT_KEYBIND = Enum.KeyCode.T
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
-local THEME = {
-	Bg = Color3.fromRGB(62, 20, 65),
-	Accent = Color3.fromRGB(255, 162, 233),
-	Text = Color3.fromRGB(199, 12, 255),
-	Stroke = Color3.fromRGB(164, 62, 212),
-	Warning = Color3.fromRGB(255, 60, 60)
-}
+local KEY_URL = "https://pastebin.com/raw/XCuDnRBT"
 
-local WAYPOINTS = {
-	Vector3.new(-355.618530, -6.595164, 113.490646),
-	Vector3.new(-348.447449, -6.595164, 21.699335),
-	Vector3.new(-331.782501, -4.480436, 20.512627)
-}
+local VALID_KEYS = {}
+local unlocked = false
 
-local Toggles = {
-	AutoBlock = false,
-	QuickAccess = false,
-	InvisOnFinish = false
-}
+local function notify(title, text, duration)
+	pcall(function()
+		StarterGui:SetCore("SendNotification", {
+			Title = title or "Raxel Hub",
+			Text = text or "",
+			Duration = duration or 3
+		})
+	end)
+end
 
-local currentKeybind = DEFAULT_KEYBIND
-local isBinding = false
-local isRunning = false
+local function loadKeys()
+	local ok, result = pcall(function()
+		return game:HttpGet(KEY_URL)
+	end)
 
---------------------------------------------------------------------------------
--- CORE LOGIC
---------------------------------------------------------------------------------
-
-local function getClosestPlayer()
-	local closest = nil
-	local maxDist = math.huge
-	local myRoot = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-	if not myRoot then return nil end
-
-	for _, p in pairs(Players:GetPlayers()) do
-		if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-			local dist = (myRoot.Position - p.Character.HumanoidRootPart.Position).Magnitude
-			if dist < maxDist then
-				maxDist = dist
-				closest = p
+	if ok and result then
+		for line in string.gmatch(result, "[^\r\n]+") do
+			line = string.gsub(line, "^%s+", "")
+			line = string.gsub(line, "%s+$", "")
+			if line ~= "" then
+				table.insert(VALID_KEYS, line)
 			end
 		end
 	end
-	return closest
 end
 
-local function triggerRobloxBlock()
-	local target = getClosestPlayer()
-	if not target then return end
+local function isValidKey(text)
+	for _, key in ipairs(VALID_KEYS) do
+		if text == key then
+			return true
+		end
+	end
+	return false
+end
 
-	-- Force Roblox Prompt
-	pcall(function()
-		StarterGui:SetCore("PromptBlockPlayer", target)
+local function makeCorner(obj, radius)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius or 12)
+	c.Parent = obj
+	return c
+end
+
+local function makeStroke(obj, thickness, color)
+	local s = Instance.new("UIStroke")
+	s.Thickness = thickness or 1.5
+	s.Color = color or Color3.fromRGB(255,255,255)
+	s.Parent = obj
+	return s
+end
+
+local function rgbText(label)
+	task.spawn(function()
+		local h = 0
+		while label and label.Parent do
+			label.TextColor3 = Color3.fromHSV(h, 1, 1)
+			h += 0.005
+			if h >= 1 then
+				h = 0
+			end
+			task.wait(0.03)
+		end
+	end)
+end
+
+local function rgbBackground(button)
+	task.spawn(function()
+		local h = 0
+		while button and button.Parent do
+			button.BackgroundColor3 = Color3.fromHSV(h, 0.85, 1)
+			h += 0.004
+			if h >= 1 then
+				h = 0
+			end
+			task.wait(0.03)
+		end
+	end)
+end
+
+local function addHover(button, normalSize, hoverSize)
+	button.MouseEnter:Connect(function()
+		TweenService:Create(
+			button,
+			TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{Size = hoverSize}
+		):Play()
 	end)
 
-	-- Wait for UI to be interactable
-	task.wait(0.4) 
-
-	-- COORDINATE CALCULATION
-	-- Roblox native prompts scale with ViewportSize. 
-	-- The "Block" button is typically at 50% Width and ~53-55% Height.
-	local viewportSize = Camera.ViewportSize
-	local centerX = viewportSize.X / 2
-	local centerY = viewportSize.Y * 0.54 -- Adjusted to sit exactly on the blue 'Block' button
-
-	-- Perform 2 clicks to ensure registration
-	for i = 1, 2 do
-		VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 1)
-		task.wait(0.02)
-		VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 1)
-		task.wait(0.05)
-	end
+	button.MouseLeave:Connect(function()
+		TweenService:Create(
+			button,
+			TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{Size = normalSize}
+		):Play()
+	end)
 end
 
---------------------------------------------------------------------------------
--- UI SYSTEM
---------------------------------------------------------------------------------
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "Calmet steal block"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = Player:WaitForChild("PlayerGui")
-ScreenGui.DisplayOrder = 100
-
-local function createRounded(className, parent, size, color, layoutOrder)
-	local obj = Instance.new(className)
-	obj.Size = size
-	obj.BackgroundColor3 = color
-	obj.BorderSizePixel = 0
-	obj.Parent = parent
-	if layoutOrder then obj.LayoutOrder = layoutOrder end
-	Instance.new("UICorner", obj).CornerRadius = UDim.new(0, 6)
-	local s = Instance.new("UIStroke", obj)
-	s.Color = THEME.Stroke
-	s.Thickness = 1.2
-	return obj
+local function shakeFrame(frame)
+	local original = frame.Position
+	for i = 1, 6 do
+		frame.Position = original + UDim2.new(0, math.random(-8,8), 0, 0)
+		task.wait(0.03)
+	end
+	frame.Position = original
 end
 
-local Toggle = createRounded("TextButton", ScreenGui, UDim2.new(0, 40, 0, 40), THEME.Bg)
-Toggle.Position = UDim2.new(0, 10, 0.5, -20)
-Toggle.Text = "open"
-Toggle.Font = Enum.Font.GothamBlack
-Toggle.TextColor3 = THEME.Accent
-Toggle.TextSize = 18
+loadKeys()
 
-local Container = createRounded("Frame", ScreenGui, UDim2.new(0, 180, 0, 260), THEME.Bg)
-Container.Position = UDim2.new(0, 60, 0.5, -130)
-Container.Visible = true
+local gui = Instance.new("ScreenGui")
+gui.Name = "RaxelHubUI"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
 
-local UIList = Instance.new("UIListLayout", Container)
-UIList.SortOrder = Enum.SortOrder.LayoutOrder
-UIList.Padding = UDim.new(0, 5)
-UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-UIList.VerticalAlignment = Enum.VerticalAlignment.Center
+local overlay = Instance.new("Frame")
+overlay.Parent = gui
+overlay.Size = UDim2.new(1,0,1,0)
+overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
+overlay.BackgroundTransparency = 1
+overlay.BorderSizePixel = 0
 
-local Title = Instance.new("TextLabel", Container)
-Title.Size = UDim2.new(0.9, 0, 0, 30)
-Title.BackgroundTransparency = 1
-Title.Text = "Raxel Hub TP Block"
-Title.Font = Enum.Font.GothamBlack
-Title.TextColor3 = THEME.Text
-Title.TextSize = 14
-Title.LayoutOrder = 1
+local main = Instance.new("Frame")
+main.Parent = gui
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.Position = UDim2.new(0.5, 0, 0.5, 30)
+main.Size = UDim2.new(0, 430, 0, 300)
+main.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+main.BorderSizePixel = 0
+main.BackgroundTransparency = 1
+makeCorner(main, 18)
+makeStroke(main, 2, Color3.fromRGB(90, 90, 120))
 
-local TeleportBtn = createRounded("TextButton", Container, UDim2.new(0.9, 0, 0, 35), THEME.Accent, 2)
-TeleportBtn.Text = "Teleport"
-TeleportBtn.Font = Enum.Font.GothamBlack
-TeleportBtn.TextColor3 = THEME.Text
-TeleportBtn.TextSize = 16
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(20,20,30)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(35,18,50))
+}
+gradient.Rotation = 45
+gradient.Parent = main
 
-local AutoBlockBtn = createRounded("TextButton", Container, UDim2.new(0.9, 0, 0, 30), Color3.fromRGB(40, 40, 45), 3)
-AutoBlockBtn.Text = "Auto Block: OFF"
-AutoBlockBtn.Font = Enum.Font.GothamBold
-AutoBlockBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-AutoBlockBtn.TextSize = 12
+local title = Instance.new("TextLabel")
+title.Parent = main
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, -40, 0, 50)
+title.Position = UDim2.new(0, 20, 0, 18)
+title.Text = "Raxel Hub"
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 30
+title.TextXAlignment = Enum.TextXAlignment.Center
+title.TextYAlignment = Enum.TextYAlignment.Center
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextTransparency = 1
+rgbText(title)
 
-local QuickAccessBtn = createRounded("TextButton", Container, UDim2.new(0.9, 0, 0, 30), Color3.fromRGB(40, 40, 45), 4)
-QuickAccessBtn.Text = "Quick acces: OFF"
-QuickAccessBtn.Font = Enum.Font.GothamBold
-QuickAccessBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-QuickAccessBtn.TextSize = 12
+local subtitle = Instance.new("TextLabel")
+subtitle.Parent = main
+subtitle.BackgroundTransparency = 1
+subtitle.Size = UDim2.new(1, -40, 0, 24)
+subtitle.Position = UDim2.new(0, 20, 0, 58)
+subtitle.Text = "Key System"
+subtitle.Font = Enum.Font.GothamSemibold
+subtitle.TextSize = 14
+subtitle.TextColor3 = Color3.fromRGB(180,180,180)
+subtitle.TextTransparency = 1
 
+local keyPanel = Instance.new("Frame")
+keyPanel.Parent = main
+keyPanel.Size = UDim2.new(1, -40, 0, 90)
+keyPanel.Position = UDim2.new(0, 20, 0, 95)
+keyPanel.BackgroundTransparency = 1
+keyPanel.BorderSizePixel = 0
 
-local KeybindBtn = createRounded("TextButton", Container, UDim2.new(0.9, 0, 0, 25), Color3.fromRGB(35, 35, 40), 6)
-KeybindBtn.Text = "Key: " .. currentKeybind.Name
-KeybindBtn.Font = Enum.Font.GothamBold
-KeybindBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-KeybindBtn.TextSize = 10
+local keyBox = Instance.new("TextBox")
+keyBox.Parent = keyPanel
+keyBox.Size = UDim2.new(1, -130, 0, 42)
+keyBox.Position = UDim2.new(0, 12, 0, 24)
+keyBox.PlaceholderText = "Key gir..."
+keyBox.Text = ""
+keyBox.Font = Enum.Font.GothamMedium
+keyBox.TextSize = 16
+keyBox.TextColor3 = Color3.fromRGB(255,255,255)
+keyBox.PlaceholderColor3 = Color3.fromRGB(140,140,140)
+keyBox.BackgroundColor3 = Color3.fromRGB(18,18,24)
+keyBox.BackgroundTransparency = 1
+keyBox.TextTransparency = 1
+keyBox.BorderSizePixel = 0
+makeCorner(keyBox, 10)
+makeStroke(keyBox, 1.2, Color3.fromRGB(90,90,120))
 
-local QuickBlockGUI = createRounded("TextButton", ScreenGui, UDim2.new(0, 120, 0, 60), THEME.Warning)
-QuickBlockGUI.Position = UDim2.new(0.5, -60, 0.4, 0)
-QuickBlockGUI.Text = "BLOCK"
-QuickBlockGUI.Font = Enum.Font.GothamBlack
-QuickBlockGUI.TextSize = 24
-QuickBlockGUI.TextColor3 = Color3.new(1,1,1)
-QuickBlockGUI.Visible = false
+local checkBtn = Instance.new("TextButton")
+checkBtn.Parent = keyPanel
+checkBtn.Size = UDim2.new(0, 100, 0, 42)
+checkBtn.Position = UDim2.new(1, -112, 0, 24)
+checkBtn.Text = "ENTER"
+checkBtn.Font = Enum.Font.GothamBlack
+checkBtn.TextSize = 15
+checkBtn.TextColor3 = Color3.fromRGB(255,255,255)
+checkBtn.TextTransparency = 1
+checkBtn.BackgroundTransparency = 1
+checkBtn.BorderSizePixel = 0
+makeCorner(checkBtn, 10)
+rgbBackground(checkBtn)
+addHover(checkBtn, UDim2.new(0,100,0,42), UDim2.new(0,106,0,46))
 
---------------------------------------------------------------------------------
--- EXECUTION
---------------------------------------------------------------------------------
+local content = Instance.new("Frame")
+content.Parent = main
+content.AnchorPoint = Vector2.new(0.5, 0.5)
+content.Size = UDim2.new(1, -40, 0, 120)
+content.Position = UDim2.new(0.5, 0, 0.68, 0)
+content.BackgroundTransparency = 1
+content.Visible = false
 
-local function toggleState(btn, settingName, textPrefix)
-	Toggles[settingName] = not Toggles[settingName]
-	btn.BackgroundColor3 = Toggles[settingName] and THEME.Accent or Color3.fromRGB(40, 40, 45)
-	btn.TextColor3 = Toggles[settingName] and THEME.Text or Color3.fromRGB(150, 150, 150)
-	btn.Text = textPrefix .. (Toggles[settingName] and ": ON" or ": OFF")
-	if settingName == "QuickAccess" then QuickBlockGUI.Visible = Toggles.QuickAccess end
+local tpBlockBtn = Instance.new("TextButton")
+tpBlockBtn.Parent = content
+tpBlockBtn.AnchorPoint = Vector2.new(0.5, 0.5)
+tpBlockBtn.Size = UDim2.new(0, 300, 0, 56)
+tpBlockBtn.Position = UDim2.new(0.5, 0, 0.5, 0)
+tpBlockBtn.Text = "TP Block"
+tpBlockBtn.Font = Enum.Font.GothamBlack
+tpBlockBtn.TextSize = 22
+tpBlockBtn.TextColor3 = Color3.fromRGB(255,255,255)
+tpBlockBtn.TextTransparency = 1
+tpBlockBtn.BackgroundTransparency = 1
+tpBlockBtn.BorderSizePixel = 0
+makeCorner(tpBlockBtn, 14)
+rgbBackground(tpBlockBtn)
+addHover(tpBlockBtn, UDim2.new(0,300,0,56), UDim2.new(0,312,0,60))
+
+local premiumLabel = Instance.new("TextLabel")
+premiumLabel.Parent = gui
+premiumLabel.AnchorPoint = Vector2.new(0, 1)
+premiumLabel.Position = UDim2.new(0, 12, 1, -10)
+premiumLabel.Size = UDim2.new(0, 220, 0, 28)
+premiumLabel.BackgroundTransparency = 1
+premiumLabel.Text = "Raxel Hub Premium"
+premiumLabel.Font = Enum.Font.GothamBold
+premiumLabel.TextSize = 16
+premiumLabel.TextXAlignment = Enum.TextXAlignment.Left
+premiumLabel.TextColor3 = Color3.fromRGB(255,255,255)
+rgbText(premiumLabel)
+
+local function playOpenAnimation()
+	main.Size = UDim2.new(0, 380, 0, 260)
+
+	TweenService:Create(
+		main,
+		TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{
+			Size = UDim2.new(0, 430, 0, 300),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			BackgroundTransparency = 0
+		}
+	):Play()
+
+	TweenService:Create(
+		title,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{TextTransparency = 0}
+	):Play()
+
+	TweenService:Create(
+		subtitle,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{TextTransparency = 0}
+	):Play()
+
+	TweenService:Create(
+		keyBox,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{
+			BackgroundTransparency = 0,
+			TextTransparency = 0
+		}
+	):Play()
+
+	TweenService:Create(
+		checkBtn,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{
+			BackgroundTransparency = 0,
+			TextTransparency = 0
+		}
+	):Play()
 end
 
-local function RunPath()
-	if isRunning then return end
-	local char = Player.Character
-	local root = char and char:FindFirstChild("HumanoidRootPart")
-	local hum = char and char:FindFirstChild("Humanoid")
-	if not root or not hum then return end
+local function playUnlockAnimation()
+	local hide1 = TweenService:Create(
+		keyBox,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{
+			BackgroundTransparency = 1,
+			TextTransparency = 1
+		}
+	)
 
-	isRunning = true
-	TeleportBtn.Text = "..."
+	local hide2 = TweenService:Create(
+		checkBtn,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{
+			BackgroundTransparency = 1,
+			TextTransparency = 1
+		}
+	)
 
-	local carpet = char:FindFirstChild(TARGET_TOOL) or Player.Backpack:FindFirstChild(TARGET_TOOL)
-	if carpet then
-		hum:EquipTool(carpet)
-		task.wait(0.05)
-		carpet:Activate()
-	end
+	local hide3 = TweenService:Create(
+		subtitle,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{TextTransparency = 1}
+	)
 
-	root.Anchored = true
-	for i, point in ipairs(WAYPOINTS) do
-		root.CFrame = CFrame.new(point + Vector3.new(0, 4, 0))
-		task.wait(TELEPORT_DELAY)
-	end
-	root.Anchored = false
+	hide1:Play()
+	hide2:Play()
+	hide3:Play()
 
-	if carpet and carpet.Parent == char then carpet.Parent = Player.Backpack end
+	task.wait(0.22)
 
-	-- INVIS CLOAK OPTIMIZED SPEED
-	if Toggles.InvisOnFinish then
-		task.wait(SAFETY_DELAY)
-		local cloak = Player.Backpack:FindFirstChild(INVIS_TOOL)
-		if cloak then
-			hum:EquipTool(cloak)
-			-- No extra task.wait here, activate immediately after equip call
-			cloak:Activate()
-		end
-	end
+	keyPanel.Visible = false
+	subtitle.Visible = false
+	content.Visible = true
 
-	TeleportBtn.Text = "Teleport"
-	isRunning = false
+	tpBlockBtn.Size = UDim2.new(0, 240, 0, 48)
+	tpBlockBtn.TextTransparency = 1
+	tpBlockBtn.BackgroundTransparency = 1
+
+	local showBtn = TweenService:Create(
+		tpBlockBtn,
+		TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{
+			Size = UDim2.new(0, 300, 0, 56),
+			TextTransparency = 0,
+			BackgroundTransparency = 0
+		}
+	)
+	showBtn:Play()
 end
 
-ProximityPromptService.PromptTriggered:Connect(function(prompt, playerWhoTriggered)
-	if Toggles.AutoBlock and playerWhoTriggered == Player then
-		if string.find(string.lower(prompt.ActionText), "steal") or string.find(string.lower(prompt.ObjectText), "steal") then
-			triggerRobloxBlock()
-		end
+checkBtn.MouseButton1Click:Connect(function()
+	if isValidKey(keyBox.Text) then
+		unlocked = true
+		notify("Raxel Hub", "Key accepted.", 3)
+		playUnlockAnimation()
+	else
+		notify("Raxel Hub", "Invalid key.", 3)
+		shakeFrame(main)
 	end
 end)
 
-QuickBlockGUI.MouseButton1Click:Connect(triggerRobloxBlock)
-
-Toggle.MouseButton1Click:Connect(function()
-	Container.Visible = not Container.Visible
-end)
-
-KeybindBtn.MouseButton1Click:Connect(function()
-	isBinding = true
-	KeybindBtn.Text = "Press a key..."
-end)
-
-TeleportBtn.MouseButton1Click:Connect(RunPath)
-
-AutoBlockBtn.MouseButton1Click:Connect(function()
-	toggleState(AutoBlockBtn, "Auto Block", "Auto Block")
-end)
-
-QuickAccessBtn.MouseButton1Click:Connect(function()
-	toggleState(QuickAccessBtn, "QuickAccess", "Quick Access")
-end)
-
-InvisBtn.MouseButton1Click:Connect(function()
-	toggleState(InvisBtn, "InvisOnFinish", "Invis Finish")
-end)
-
-UserInputService.InputBegan:Connect(function(input, processed)
-	-- TUŞ SEÇERKEN başka şeyleri engelle
-	if isBinding then
-		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Unknown then
-			currentKeybind = input.KeyCode
-			KeybindBtn.Text = "Key: " .. currentKeybind.Name
-			isBinding = false
-		end
+tpBlockBtn.MouseButton1Click:Connect(function()
+	if not unlocked then
+		notify("Raxel Hub", "Önce key girmen gerekiyor.", 3)
 		return
 	end
 
-	if processed then return end
+	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
+    https://pastebin.com/raw/gZMGfTfx
 
-	-- SEÇİLEN TUŞA BASINCA
-	if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == currentKeybind then
-		RunPath()
+
+end)
+
+local dragging = false
+local dragStart
+local startPos
+
+main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
 	end
 end)
 
--- tenacious leaked this https://discord.gg/MT6BXdH9q
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(
+			startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+playOpenAnimation()
