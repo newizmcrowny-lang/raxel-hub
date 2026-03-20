@@ -5,7 +5,6 @@ local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
-local HttpService = game:GetService("HttpService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -137,10 +136,11 @@ overlay.BorderSizePixel = 0
 local main = Instance.new("Frame")
 main.Parent = gui
 main.AnchorPoint = Vector2.new(0.5, 0.5)
-main.Position = UDim2.new(0.5, 0, 0.5, 0)
+main.Position = UDim2.new(0.5, 0, 0.5, 30)
 main.Size = UDim2.new(0, 430, 0, 300)
 main.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 main.BorderSizePixel = 0
+main.BackgroundTransparency = 1
 makeCorner(main, 18)
 makeStroke(main, 2, Color3.fromRGB(90, 90, 120))
 
@@ -163,6 +163,7 @@ title.TextSize = 30
 title.TextXAlignment = Enum.TextXAlignment.Center
 title.TextYAlignment = Enum.TextYAlignment.Center
 title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextTransparency = 1
 rgbText(title)
 
 local subtitle = Instance.new("TextLabel")
@@ -174,6 +175,7 @@ subtitle.Text = "Key System"
 subtitle.Font = Enum.Font.GothamSemibold
 subtitle.TextSize = 14
 subtitle.TextColor3 = Color3.fromRGB(180,180,180)
+subtitle.TextTransparency = 1
 
 local keyPanel = Instance.new("Frame")
 keyPanel.Parent = main
@@ -193,6 +195,8 @@ keyBox.TextSize = 16
 keyBox.TextColor3 = Color3.fromRGB(255,255,255)
 keyBox.PlaceholderColor3 = Color3.fromRGB(140,140,140)
 keyBox.BackgroundColor3 = Color3.fromRGB(18,18,24)
+keyBox.BackgroundTransparency = 1
+keyBox.TextTransparency = 1
 keyBox.BorderSizePixel = 0
 makeCorner(keyBox, 10)
 makeStroke(keyBox, 1.2, Color3.fromRGB(90,90,120))
@@ -205,6 +209,8 @@ checkBtn.Text = "ENTER"
 checkBtn.Font = Enum.Font.GothamBlack
 checkBtn.TextSize = 15
 checkBtn.TextColor3 = Color3.fromRGB(255,255,255)
+checkBtn.TextTransparency = 1
+checkBtn.BackgroundTransparency = 1
 checkBtn.BorderSizePixel = 0
 makeCorner(checkBtn, 10)
 rgbBackground(checkBtn)
@@ -213,32 +219,140 @@ addHover(checkBtn, UDim2.new(0,100,0,42), UDim2.new(0,106,0,46))
 local content = Instance.new("Frame")
 content.Parent = main
 content.AnchorPoint = Vector2.new(0.5, 0.5)
-content.Position = UDim2.new(0.5, 0, 0.65, 0)
 content.Size = UDim2.new(1, -40, 0, 120)
+content.Position = UDim2.new(0.5, 0, 0.68, 0)
 content.BackgroundTransparency = 1
 content.Visible = false
 
 local tpBlockBtn = Instance.new("TextButton")
 tpBlockBtn.Parent = content
 tpBlockBtn.AnchorPoint = Vector2.new(0.5, 0.5)
-tpBlockBtn.Size = UDim2.new(0, 260, 0, 52)
+tpBlockBtn.Size = UDim2.new(0, 300, 0, 56)
 tpBlockBtn.Position = UDim2.new(0.5, 0, 0.5, 0)
 tpBlockBtn.Text = "TP Block"
 tpBlockBtn.Font = Enum.Font.GothamBlack
-tpBlockBtn.TextSize = 20
+tpBlockBtn.TextSize = 22
 tpBlockBtn.TextColor3 = Color3.fromRGB(255,255,255)
+tpBlockBtn.TextTransparency = 1
+tpBlockBtn.BackgroundTransparency = 1
 tpBlockBtn.BorderSizePixel = 0
 makeCorner(tpBlockBtn, 14)
 rgbBackground(tpBlockBtn)
-addHover(tpBlockBtn, UDim2.new(0,260,0,52), UDim2.new(0,270,0,56))
+addHover(tpBlockBtn, UDim2.new(0,300,0,56), UDim2.new(0,312,0,60))
+
+local premiumLabel = Instance.new("TextLabel")
+premiumLabel.Parent = gui
+premiumLabel.AnchorPoint = Vector2.new(0, 1)
+premiumLabel.Position = UDim2.new(0, 12, 1, -10)
+premiumLabel.Size = UDim2.new(0, 220, 0, 28)
+premiumLabel.BackgroundTransparency = 1
+premiumLabel.Text = "Raxel Hub Premium"
+premiumLabel.Font = Enum.Font.GothamBold
+premiumLabel.TextSize = 16
+premiumLabel.TextXAlignment = Enum.TextXAlignment.Left
+premiumLabel.TextColor3 = Color3.fromRGB(255,255,255)
+rgbText(premiumLabel)
+
+local function playOpenAnimation()
+	main.Size = UDim2.new(0, 380, 0, 260)
+
+	TweenService:Create(
+		main,
+		TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{
+			Size = UDim2.new(0, 430, 0, 300),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			BackgroundTransparency = 0
+		}
+	):Play()
+
+	TweenService:Create(
+		title,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{TextTransparency = 0}
+	):Play()
+
+	TweenService:Create(
+		subtitle,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{TextTransparency = 0}
+	):Play()
+
+	TweenService:Create(
+		keyBox,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{
+			BackgroundTransparency = 0,
+			TextTransparency = 0
+		}
+	):Play()
+
+	TweenService:Create(
+		checkBtn,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{
+			BackgroundTransparency = 0,
+			TextTransparency = 0
+		}
+	):Play()
+end
+
+local function playUnlockAnimation()
+	local hide1 = TweenService:Create(
+		keyBox,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{
+			BackgroundTransparency = 1,
+			TextTransparency = 1
+		}
+	)
+
+	local hide2 = TweenService:Create(
+		checkBtn,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{
+			BackgroundTransparency = 1,
+			TextTransparency = 1
+		}
+	)
+
+	local hide3 = TweenService:Create(
+		subtitle,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{TextTransparency = 1}
+	)
+
+	hide1:Play()
+	hide2:Play()
+	hide3:Play()
+
+	task.wait(0.22)
+
+	keyPanel.Visible = false
+	subtitle.Visible = false
+	content.Visible = true
+
+	tpBlockBtn.Size = UDim2.new(0, 240, 0, 48)
+	tpBlockBtn.TextTransparency = 1
+	tpBlockBtn.BackgroundTransparency = 1
+
+	local showBtn = TweenService:Create(
+		tpBlockBtn,
+		TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{
+			Size = UDim2.new(0, 300, 0, 56),
+			TextTransparency = 0,
+			BackgroundTransparency = 0
+		}
+	)
+	showBtn:Play()
+end
 
 checkBtn.MouseButton1Click:Connect(function()
 	if isValidKey(keyBox.Text) then
 		unlocked = true
-		keyPanel.Visible = false
-		subtitle.Visible = false
-		content.Visible = true
 		notify("Raxel Hub", "Key accepted.", 3)
+		playUnlockAnimation()
 	else
 		notify("Raxel Hub", "Invalid key.", 3)
 		shakeFrame(main)
@@ -246,9 +360,14 @@ checkBtn.MouseButton1Click:Connect(function()
 end)
 
 tpBlockBtn.MouseButton1Click:Connect(function()
+	if not unlocked then
+		notify("Raxel Hub", "Önce key girmen gerekiyor.", 3)
+		return
+	end
 
 	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
-	loadstring(game:HttpGet("https://pastebin.com/raw/gZMGfTfx"))()
+    https://pastebin.com/raw/gZMGfTfx
+
 
 end)
 
@@ -279,3 +398,5 @@ UserInputService.InputChanged:Connect(function(input)
 		)
 	end
 end)
+
+playOpenAnimation()
