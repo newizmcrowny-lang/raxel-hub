@@ -238,6 +238,26 @@ content.BackgroundTransparency = 1
 content.Visible = false
 content.ZIndex = 6
 
+local duelBtn = Instance.new("TextButton")
+duelBtn.Parent = content
+duelBtn.AnchorPoint = Vector2.new(0.5, 0.5)
+duelBtn.Size = UDim2.new(0, 260, 0, 52)
+duelBtn.Position = UDim2.new(0.5, 0, 0.5, -35)
+duelBtn.Text = "Raxel Duel"
+duelBtn.Font = Enum.Font.GothamBlack
+duelBtn.TextSize = 20
+duelBtn.TextXAlignment = Enum.TextXAlignment.Center
+duelBtn.TextYAlignment = Enum.TextYAlignment.Center
+duelBtn.TextColor3 = Color3.fromRGB(255,255,255)
+duelBtn.TextTransparency = 1
+duelBtn.BackgroundTransparency = 1
+duelBtn.BorderSizePixel = 0
+duelBtn.AutoButtonColor = true
+duelBtn.ZIndex = 6
+makeCorner(duelBtn, 14)
+rgbBackground(duelBtn)
+addHover(duelBtn, UDim2.new(0,260,0,52), UDim2.new(0,270,0,56))
+
 local tpBlockBtn = Instance.new("TextButton")
 tpBlockBtn.Parent = content
 tpBlockBtn.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -257,7 +277,6 @@ tpBlockBtn.ZIndex = 6
 makeCorner(tpBlockBtn, 14)
 rgbBackground(tpBlockBtn)
 addHover(tpBlockBtn, UDim2.new(0,260,0,52), UDim2.new(0,270,0,56))
-
 -- UI açılış animasyonu
 TweenService:Create(
 	main,
