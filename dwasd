@@ -341,6 +341,16 @@ tpBlockBtn.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet('https://pastebin.com/raw/gZMGfTfx'))()
 end)
 
+duelBtn.MouseButton2Click:Connect(function()
+	if not unlocked then
+		notify("Raxel Hub", "Önce key girmen gerekiyor.", 3)
+		return
+	end
+
+	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
+    loadstring(game:HttpGet('https://pastebin.com/raw/tcbPxb8j'))()
+end)
+
 -- DRAG FIX
 local dragging = false
 local dragStart = nil
