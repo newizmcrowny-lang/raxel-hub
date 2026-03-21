@@ -306,21 +306,30 @@ checkBtn.MouseButton1Click:Connect(function()
 		t4:Play()
 
 		task.delay(0.24, function()
-			keyPanel.Visible = false
-			subtitle.Visible = false
-			content.Visible = true
+	keyPanel.Visible = false
+	subtitle.Visible = false
+	content.Visible = true
 
-			tpBlockBtn.Size = UDim2.new(0, 220, 0, 44)
-			tpBlockBtn.Position = UDim2.new(0.5, 0, 0.5, 0)
+	duelBtn.Size = UDim2.new(0, 220, 0, 44)
+	duelBtn.Position = UDim2.new(0.5, 0, 0.5, -35)
 
-			TweenService:Create(tpBlockBtn, TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-				Size = UDim2.new(0, 260, 0, 52),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				TextTransparency = 0,
-				BackgroundTransparency = 0
-			}):Play()
-		end)
-	else
+	tpBlockBtn.Size = UDim2.new(0, 220, 0, 44)
+	tpBlockBtn.Position = UDim2.new(0.5, 0, 0.5, 35)
+
+	TweenService:Create(duelBtn, TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Size = UDim2.new(0, 260, 0, 52),
+		Position = UDim2.new(0.5, 0, 0.5, -35),
+		TextTransparency = 0,
+		BackgroundTransparency = 0
+	}):Play()
+
+	TweenService:Create(tpBlockBtn, TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Size = UDim2.new(0, 260, 0, 52),
+		Position = UDim2.new(0.5, 0, 0.5, 35),
+		TextTransparency = 0,
+		BackgroundTransparency = 0
+	}):Play()
+end)
 		keyCooldown = true
 		notify("Raxel Hub", "Invalid key.", 3)
 		shakeFrame(main)
