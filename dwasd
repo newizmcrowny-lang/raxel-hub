@@ -377,7 +377,7 @@ duelBtn.MouseButton1Click:Connect(function()
 	end
 
 	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
-    loadstring(game:HttpGet('hhttps://pastebin.com/raw/vcwNFkB2'))()
+    loadstring(game:HttpGet('https://pastebin.com/raw/vcwNFkB2'))()
 end)
 
 -- DRAG FIX
