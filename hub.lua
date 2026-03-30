@@ -10,7 +10,7 @@ local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local KEY_URL = "https://pastebin.com/raw/nURU3RD3"
+local KEY_URL = "https://pastebin.com/raw/1b02z7sE"
 
 local VALID_KEYS = {}
 local unlocked = false
