@@ -367,7 +367,7 @@ tpBlockBtn.MouseButton1Click:Connect(function()
 	end
 
 	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
-	loadstring(game:HttpGet('https://pastebin.com/raw/a54Mxamp'))()
+	loadstring(game:HttpGet('https://pastebin.com/raw/tcbPxb8j'))()
 end)
 
 duelBtn.MouseButton1Click:Connect(function()
