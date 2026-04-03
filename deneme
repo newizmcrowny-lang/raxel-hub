@@ -129,39 +129,59 @@ gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = playerGui
 
--- SİYAH ARKA PLAN
+-- EKRAN ARKASI ŞEFFAF KALIYOR
 local overlay = Instance.new("Frame")
 overlay.Parent = gui
 overlay.Size = UDim2.new(1,0,1,0)
 overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
-overlay.BackgroundTransparency = 0.2
+overlay.BackgroundTransparency = 1
 overlay.BorderSizePixel = 0
 overlay.ZIndex = 0
 
--- KAR EFEKTİ
+local main = Instance.new("Frame")
+main.Parent = gui
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.Position = UDim2.new(0.5, 0, 0.5, 20)
+main.Size = UDim2.new(0, 430, 0, 0)
+main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+main.BorderSizePixel = 0
+main.ClipsDescendants = true
+main.ZIndex = 5
+makeCorner(main, 18)
+makeStroke(main, 2, Color3.fromRGB(90, 90, 120))
+
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(20,20,20))
+}
+gradient.Rotation = 45
+gradient.Parent = main
+
+-- SADECE MENÜ İÇİN KAR EFEKTİ
 local snowContainer = Instance.new("Frame")
-snowContainer.Parent = gui
+snowContainer.Parent = main
 snowContainer.Size = UDim2.new(1,0,1,0)
 snowContainer.BackgroundTransparency = 1
 snowContainer.BorderSizePixel = 0
 snowContainer.ZIndex = 1
+snowContainer.ClipsDescendants = true
 
-for i = 1, 80 do
+for i = 1, 60 do
 	task.spawn(function()
 		local snow = Instance.new("Frame")
 		snow.Parent = snowContainer
-		local size = math.random(2, 4)
+		local size = math.random(2,3)
 		snow.Size = UDim2.new(0, size, 0, size)
 		snow.BackgroundColor3 = Color3.fromRGB(255,255,255)
 		snow.BorderSizePixel = 0
-		snow.Position = UDim2.new(math.random(), 0, -0.1, 0)
 		snow.ZIndex = 1
 		makeCorner(snow, 50)
 
 		while snow.Parent do
-			local startX = math.random()
-			local drift = math.random(-8, 8) / 100
-			local speed = math.random(4, 8)
+			local startX = math.random(0, 1000) / 1000
+			local drift = math.random(-3, 3) / 100
+			local speed = math.random(5, 9)
 
 			snow.Position = UDim2.new(startX, 0, -0.1, 0)
 
@@ -183,26 +203,6 @@ for i = 1, 80 do
 		end
 	end)
 end
-
-local main = Instance.new("Frame")
-main.Parent = gui
-main.AnchorPoint = Vector2.new(0.5, 0.5)
-main.Position = UDim2.new(0.5, 0, 0.5, 20)
-main.Size = UDim2.new(0, 430, 0, 0)
-main.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-main.BorderSizePixel = 0
-main.ClipsDescendants = true
-main.ZIndex = 5
-makeCorner(main, 18)
-makeStroke(main, 2, Color3.fromRGB(90, 90, 120))
-
-local gradient = Instance.new("UIGradient")
-gradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(20,20,30)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(35,18,50))
-}
-gradient.Rotation = 45
-gradient.Parent = main
 
 local title = Instance.new("TextLabel")
 title.Parent = main
@@ -324,6 +324,7 @@ makeCorner(tpBlockBtn, 14)
 rgbBackground(tpBlockBtn)
 addHover(tpBlockBtn, UDim2.new(0,260,0,52), UDim2.new(0,270,0,56))
 
+-- UI açılış animasyonu
 TweenService:Create(
 	main,
 	TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -412,6 +413,7 @@ tpBlockBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
+	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
 	loadstring(game:HttpGet('https://pastebin.com/raw/r9VapDwv'))()
 end)
 
@@ -421,6 +423,7 @@ duelBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
+	-- BURAYA KODUNU YAPIŞTIR ↓↓↓
 	loadstring(game:HttpGet('https://pastebin.com/raw/vcwNFkB2'))()
 end)
 
