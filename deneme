@@ -129,7 +129,6 @@ gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = playerGui
 
--- EKRAN ARKASI ŞEFFAF KALIYOR
 local overlay = Instance.new("Frame")
 overlay.Parent = gui
 overlay.Size = UDim2.new(1,0,1,0)
@@ -143,7 +142,7 @@ main.Parent = gui
 main.AnchorPoint = Vector2.new(0.5, 0.5)
 main.Position = UDim2.new(0.5, 0, 0.5, 20)
 main.Size = UDim2.new(0, 430, 0, 0)
-main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+main.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 main.BorderSizePixel = 0
 main.ClipsDescendants = true
 main.ZIndex = 5
@@ -152,57 +151,11 @@ makeStroke(main, 2, Color3.fromRGB(90, 90, 120))
 
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(20,20,20))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(20,20,30)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(35,18,50))
 }
 gradient.Rotation = 45
 gradient.Parent = main
-
--- SADECE MENÜ İÇİN KAR EFEKTİ
-local snowContainer = Instance.new("Frame")
-snowContainer.Parent = main
-snowContainer.Size = UDim2.new(1,0,1,0)
-snowContainer.BackgroundTransparency = 1
-snowContainer.BorderSizePixel = 0
-snowContainer.ZIndex = 1
-snowContainer.ClipsDescendants = true
-
-for i = 1, 60 do
-	task.spawn(function()
-		local snow = Instance.new("Frame")
-		snow.Parent = snowContainer
-		local size = math.random(2,3)
-		snow.Size = UDim2.new(0, size, 0, size)
-		snow.BackgroundColor3 = Color3.fromRGB(255,255,255)
-		snow.BorderSizePixel = 0
-		snow.ZIndex = 1
-		makeCorner(snow, 50)
-
-		while snow.Parent do
-			local startX = math.random(0, 1000) / 1000
-			local drift = math.random(-3, 3) / 100
-			local speed = math.random(5, 9)
-
-			snow.Position = UDim2.new(startX, 0, -0.1, 0)
-
-			local tween = TweenService:Create(
-				snow,
-				TweenInfo.new(speed, Enum.EasingStyle.Linear),
-				{
-					Position = UDim2.new(
-						math.clamp(startX + drift, 0, 1),
-						0,
-						1.1,
-						0
-					)
-				}
-			)
-
-			tween:Play()
-			tween.Completed:Wait()
-		end
-	end)
-end
 
 local title = Instance.new("TextLabel")
 title.Parent = main
@@ -281,8 +234,66 @@ content.Parent = main
 content.Size = UDim2.new(1, -40, 0, 100)
 content.Position = UDim2.new(0, 20, 0, 185)
 content.BackgroundTransparency = 1
+content.BorderSizePixel = 0
 content.Visible = false
 content.ZIndex = 6
+
+-- BUTONLARIN BULUNDUĞU MENÜNÜN ARKASI
+local menuBg = Instance.new("Frame")
+menuBg.Parent = content
+menuBg.Size = UDim2.new(1, 0, 1, 0)
+menuBg.Position = UDim2.new(0, 0, 0, 0)
+menuBg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+menuBg.BorderSizePixel = 0
+menuBg.ZIndex = 6
+makeCorner(menuBg, 14)
+makeStroke(menuBg, 1.2, Color3.fromRGB(50, 50, 50))
+
+-- MENÜNÜN İÇİNDE KAR EFEKTİ
+local snowContainer = Instance.new("Frame")
+snowContainer.Parent = menuBg
+snowContainer.Size = UDim2.new(1, 0, 1, 0)
+snowContainer.BackgroundTransparency = 1
+snowContainer.BorderSizePixel = 0
+snowContainer.ClipsDescendants = true
+snowContainer.ZIndex = 7
+
+for i = 1, 45 do
+	task.spawn(function()
+		local snow = Instance.new("Frame")
+		snow.Parent = snowContainer
+		local size = math.random(2, 3)
+		snow.Size = UDim2.new(0, size, 0, size)
+		snow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		snow.BorderSizePixel = 0
+		snow.ZIndex = 7
+		makeCorner(snow, 50)
+
+		while snow.Parent do
+			local startX = math.random(0, 1000) / 1000
+			local drift = math.random(-2, 2) / 100
+			local speed = math.random(4, 7)
+
+			snow.Position = UDim2.new(startX, 0, -0.1, 0)
+
+			local tween = TweenService:Create(
+				snow,
+				TweenInfo.new(speed, Enum.EasingStyle.Linear),
+				{
+					Position = UDim2.new(
+						math.clamp(startX + drift, 0, 1),
+						0,
+						1.1,
+						0
+					)
+				}
+			)
+
+			tween:Play()
+			tween.Completed:Wait()
+		end
+	end)
+end
 
 local duelBtn = Instance.new("TextButton")
 duelBtn.Parent = content
@@ -299,7 +310,7 @@ duelBtn.TextTransparency = 1
 duelBtn.BackgroundTransparency = 1
 duelBtn.BorderSizePixel = 0
 duelBtn.AutoButtonColor = true
-duelBtn.ZIndex = 6
+duelBtn.ZIndex = 8
 makeCorner(duelBtn, 14)
 rgbBackground(duelBtn)
 addHover(duelBtn, UDim2.new(0,260,0,52), UDim2.new(0,270,0,56))
@@ -319,7 +330,7 @@ tpBlockBtn.TextTransparency = 1
 tpBlockBtn.BackgroundTransparency = 1
 tpBlockBtn.BorderSizePixel = 0
 tpBlockBtn.AutoButtonColor = true
-tpBlockBtn.ZIndex = 6
+tpBlockBtn.ZIndex = 8
 makeCorner(tpBlockBtn, 14)
 rgbBackground(tpBlockBtn)
 addHover(tpBlockBtn, UDim2.new(0,260,0,52), UDim2.new(0,270,0,56))
